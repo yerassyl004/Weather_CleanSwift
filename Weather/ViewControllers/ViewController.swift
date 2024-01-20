@@ -135,6 +135,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         //        fetchData()
         //        fetchWeeklyForecastData()
         menuButton()
+        print("Text")
         backgroundImage()
         setupScroll()
         setupView()
