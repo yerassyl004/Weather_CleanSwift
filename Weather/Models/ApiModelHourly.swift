@@ -27,7 +27,7 @@ struct DatumHourly: Codable {
     let precip, pres: Double
     let rh: Int
     let slp: Double
-    let snow: Int
+    let snow: Double
     let snowDepth, solarRAD, temp: Double
     let timestampLocal, timestampUTC: String
     let ts: Int

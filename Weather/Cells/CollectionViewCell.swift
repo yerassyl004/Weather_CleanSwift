@@ -57,6 +57,18 @@ class CollectionViewCell: UICollectionViewCell {
     }
     
     func setupConstraints() {
+        
+        let blurEffect = UIBlurEffect(style: .light)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        contentView.addSubview(blurEffectView)
+        blurEffectView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            blurEffectView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            blurEffectView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            blurEffectView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            blurEffectView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+        ])
+        
         contentView.addSubview(timeLabel)
         contentView.addSubview(humidityLabel)
         contentView.addSubview(weatherImage)

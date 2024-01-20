@@ -20,7 +20,8 @@ class TableViewCell: UITableViewCell {
     let humidityLabel: UILabel = {
         let label = UILabel()
         label.text = "50%"
-        label.font = .systemFont(ofSize: 15)
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .link
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -45,7 +46,7 @@ class TableViewCell: UITableViewCell {
     
     let weatherNightImage: UIImageView = {
         let image = UIImageView()
-        image.contentMode = .scaleAspectFit
+        image.contentMode = .scaleAspectFill
         image.clipsToBounds = true
         image.image = UIImage(systemName: "snowflake")
         image.translatesAutoresizingMaskIntoConstraints = false
@@ -65,7 +66,7 @@ class TableViewCell: UITableViewCell {
         let label = UILabel()
         label.text = "25"
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 20)
+        label.font = .systemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -124,6 +125,7 @@ class TableViewCell: UITableViewCell {
         //        contentView.addSubview(slider)
         
         let heightImage = contentView.bounds.height - 10
+        let widthImage = contentView.bounds.height - 15
         
         NSLayoutConstraint.activate([
             dayLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
@@ -139,24 +141,24 @@ class TableViewCell: UITableViewCell {
             //            weatherImage.topAnchor.constraint(equalTo: contentView.topAnchor),
             weatherImage.leftAnchor.constraint(equalTo: humidityLabel.rightAnchor, constant: 20),
             weatherImage.heightAnchor.constraint(equalToConstant: heightImage),
-            weatherImage.widthAnchor.constraint(equalToConstant: heightImage),
+            weatherImage.widthAnchor.constraint(equalToConstant: widthImage),
             weatherImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
-            weatherNightImage.leftAnchor.constraint(equalTo: weatherImage.rightAnchor, constant: 15),
+            weatherNightImage.leftAnchor.constraint(equalTo: weatherImage.rightAnchor, constant: 10),
             weatherNightImage.heightAnchor.constraint(equalToConstant: heightImage),
-            weatherNightImage.widthAnchor.constraint(equalToConstant: heightImage),
+            weatherNightImage.widthAnchor.constraint(equalToConstant: widthImage),
             weatherNightImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
             
-            maxTemLabel.leftAnchor.constraint(equalTo: weatherNightImage.rightAnchor, constant: 20),
+            maxTemLabel.leftAnchor.constraint(equalTo: weatherNightImage.rightAnchor, constant: 10),
             maxTemLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            maxTemLabel.widthAnchor.constraint(equalToConstant: 30),
+            maxTemLabel.widthAnchor.constraint(equalToConstant: 35),
             
             
             minTemLabel.leftAnchor.constraint(equalTo: maxTemLabel.rightAnchor, constant: 5),
             minTemLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            minTemLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10),
-            minTemLabel.widthAnchor.constraint(equalToConstant: 30),
+            minTemLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5),
+            minTemLabel.widthAnchor.constraint(equalToConstant: 40),
         ])
         
     }
