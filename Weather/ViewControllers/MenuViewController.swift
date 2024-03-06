@@ -157,7 +157,7 @@ class MenuViewController: UIViewController{
     @objc func manageButtonTapped() {
         // Present the ManageViewController
 //        delegate?.didTapped()
-        menuDelegate?.didSelectMenuItem()
+//        menuDelegate?.didSelectMenuItem()
         manageVC.modalPresentationStyle = .fullScreen
         present(manageVC, animated: true)
     }

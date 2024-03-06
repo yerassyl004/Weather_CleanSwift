@@ -13,7 +13,7 @@ class ApiManager {
     
     private init() {}
     
-    private let apiKey = "c83f5fe73b4b4ef683870d2f0508e6d9"
+    private let apiKey = "767697f89fc6497ba92b089b1904da3f"
     private let baseURL = "https://api.weatherbit.io/v2.0/forecast/hourly"
     
     func fetchHourlyForecast(cityName: String, completion: @escaping (Result<WelcomeHourly, Error>) -> Void) {
@@ -49,7 +49,7 @@ class ApiManager {
     
     
     func fetchWeeklyForecastData(for cityName: String, completion: @escaping (Result<WelcomeWeekly, Error>) -> Void) {
-        let apiKey = "c83f5fe73b4b4ef683870d2f0508e6d9"
+        let apiKey = "767697f89fc6497ba92b089b1904da3f"
         let urlString = "https://api.weatherbit.io/v2.0/forecast/daily?city=\(cityName)&key=\(apiKey)"
         
         if let url = URL(string: urlString) {

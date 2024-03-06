@@ -7,16 +7,13 @@
 
 import UIKit
 
-class ContainerViewController: UIViewController{
+class ContainerViewController: UIViewController {
     
-
     
     enum MenuState {
         case opened
         case closed
     }
-    
-    
     
     private var menuState: MenuState = .closed
     
@@ -34,18 +31,13 @@ class ContainerViewController: UIViewController{
         addChildVC()
     }
     
-    
-    
     func addChildVC() {
         
-        
-//        let nav = UINavigationController(rootViewController: menuVC)
         addChild(menuVC)
         view.addSubview(menuVC.view)
         menuVC.didMove(toParent: self)
         menuVC.delegate = self
-//        homeVC.delegateHome = self
-//        menuVC.delegateData = homeVC
+        menuVC.menuDelegate = self
         homeVC.manageVCDelegate = menuVC
         
         let navVC = UINavigationController(rootViewController: homeVC)
@@ -102,5 +94,13 @@ extension ContainerViewController: ManageDelegate {
         //        let manageVC = ManageViewController() // Replace with your actual view controller
         //        navVC?.pushViewController(manageVC, animated: true)
         //        present(ManageViewController(), animated: true)
+    }
+}
+
+extension ContainerViewController: MenuDelegate {
+    func didSelectMenuItem() {
+        print("Tapped Menu")
+        menuState = .opened
+        menuButtonDidTapped()
     }
 }

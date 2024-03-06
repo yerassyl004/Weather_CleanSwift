@@ -12,8 +12,6 @@ protocol HomeViewControllerDelegate: AnyObject {
     func menuButtonDidTapped()
 }
 
-
-
 let screenWidth = UIScreen.main.bounds.size.width
 let screenHeight = UIScreen.main.bounds.size.height
 
@@ -23,7 +21,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 //    weak var delegateHome: HomeViewControllerDelegate?
 //    weak var manageVCDelegate: ManageViewControllerDelegate?
     
-    var currentCityName: String = "Shymkent"
+    var currentCityName: String = "Almaty"
     weak var delegate: HomeViewControllerDelegate?
     weak var manageVCDelegate: ManageViewControllerDelegate?
     
@@ -136,6 +134,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         //        fetchWeeklyForecastData()
         menuButton()
         print("Text")
+        print("New Item")
         backgroundImage()
         setupScroll()
         setupView()
@@ -146,7 +145,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         cities.append(CityData(name: "Miami", temperature: 30, icon: "c01d", currentCity: false))
         cities.append(CityData(name: "Atlanta", temperature: 20, icon: "c03n", currentCity: true))
         location()
-//        menuVC.menuDelegate = self
 //        menu.delegate = self
     }
     func location() {
@@ -292,7 +290,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     
     func fetchWeeklyForecastData() {
-        let apiKey = "c83f5fe73b4b4ef683870d2f0508e6d9"
+        let apiKey = "767697f89fc6497ba92b089b1904da3f"
         let urlString = "https://api.weatherbit.io/v2.0/forecast/daily?lat=42.3205&lon=69.5876&key=\(apiKey)"
         
         if let url = URL(string: urlString) {
@@ -551,11 +549,5 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 extension ViewController: MenuDelegate {
     func didSelectMenuItem() {
         print("Tapped Menu")
-    }
-}
-
-extension ViewController: ManageDelegate {
-    func didTapped() {
-        print("Tapped tapped")
     }
 }
