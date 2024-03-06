@@ -115,8 +115,7 @@ class ManageViewController: UIViewController {
         NSLayoutConstraint.activate([
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
             tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
-            tableView.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 20),
-//            tableView.heightAnchor.constraint(equalToConstant: updateTableViewHeight()),
+            tableView.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 20)
         ])
         
         heightConstraint = tableView.heightAnchor.constraint(equalToConstant: 0)
