@@ -15,12 +15,9 @@ protocol HomeViewControllerDelegate: AnyObject {
 let screenWidth = UIScreen.main.bounds.size.width
 let screenHeight = UIScreen.main.bounds.size.height
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+final class ViewController: UIViewController, CLLocationManagerDelegate {
     
-    
-//    weak var delegateHome: HomeViewControllerDelegate?
-//    weak var manageVCDelegate: ManageViewControllerDelegate?
-    
+    // MARK: - UI
     var currentCityName: String = "Almaty"
     weak var delegate: HomeViewControllerDelegate?
     weak var manageVCDelegate: ManageViewControllerDelegate?
@@ -44,7 +41,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         label.textAlignment = .center
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 90, weight: .thin)
-//        label.font = UIFont.preferredFont(forTextStyle: .largeTitle)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -55,7 +51,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         label.textAlignment = .center
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 20)
-//        label.font = UIFont.preferredFont(forTextStyle: .largeTitle)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -99,7 +94,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     let containerView: UIView = {
         let view = UIView()
-//        view.backgroundColor = .systemBlue
         view.layer.cornerRadius = 15
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -107,7 +101,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     let containerTableView: UIView = {
         let view = UIView()
-//        view.backgroundColor = .systemBackground
         view.layer.cornerRadius = 15
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -122,79 +115,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         return view
     }()
     
-    var locationManager: CLLocationManager!
-    
-    
-    
+    // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        //        view.backgroundImage = UIImage(named: "cloud")
-        //        fetchData()
-        //        fetchWeeklyForecastData()
         menuButton()
         print("Text")
         print("New Item")
         backgroundImage()
         setupScroll()
         setupView()
-//        let menu = MenuViewController()
-        // Do any additional setup after loading the view.
-//        fetchDataForCity(cityName: "Shymkent")
-//        fetchWeeklyForecastData(for: "Shymkent")
-        cities.append(CityData(name: "Miami", temperature: 30, icon: "c01d", currentCity: false))
-        cities.append(CityData(name: "Atlanta", temperature: 20, icon: "c03n", currentCity: true))
-        location()
-//        menu.delegate = self
     }
-    func location() {
-        locationManager = CLLocationManager()
-        locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization() // or requestAlwaysAuthorization()
-        
-//        if CLLocationManager.locationServicesEnabled() {
-//            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-//            locationManager.startUpdatingLocation()
-//        }
-    }
-    
-    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchDataForCity(cityName: currentCityName)
         fetchWeeklyForecastData(for: currentCityName)
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        switch status {
-        case .authorizedWhenInUse, .authorizedAlways:
-            // Handle authorized status
-            break
-        case .denied, .restricted:
-            // Handle denied or restricted status
-            break
-        case .notDetermined:
-            // Handle not determined status
-            break
-        @unknown default:
-            break
-        }
-    }
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        let latitude = location.coordinate.latitude
-        let longitude = location.coordinate.longitude
-        
-        print("Current Location: \(latitude), \(longitude)")
-        
-        // Optionally, stop updating location to conserve battery
-        locationManager.stopUpdatingLocation()
-    }
-
-        // Handle location manager errors
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Location manager error: \(error.localizedDescription)")
     }
     
     func dataOfWeek() -> [DatumWeekly]{
@@ -224,7 +160,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @objc func didTapMenuButton() {
         delegate?.menuButtonDidTapped()
-//        navigationController?.pushViewController(ContainerViewController(), animated: true)
     }
     
     func backgroundImage() {
@@ -307,7 +242,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 
                 do {
                     let decoder = JSONDecoder()
-                    // Decode the JSON response into WelcomeWeekly struct
                     let weeklyForecastData = try decoder.decode(WelcomeWeekly.self, from: data)
                     
                     self.weeklyForecast = weeklyForecastData.data
@@ -315,7 +249,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                     
                     print(self.weeklyForecast)
                     
-                    // Access the weekly forecast information
                     for dailyForecast in weeklyForecastData.data {
                         print("Date: \(dailyForecast.datetime)")
                         print("Temperature: \(dailyForecast.temp)°C")
@@ -543,11 +476,5 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-    }
-}
-
-extension ViewController: MenuDelegate {
-    func didSelectMenuItem() {
-        print("Tapped Menu")
     }
 }

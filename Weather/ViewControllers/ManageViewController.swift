@@ -92,7 +92,6 @@ class ManageViewController: UIViewController {
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             stackView.leftAnchor.constraint(equalTo: scrollView.leftAnchor),
-//            stackView.rightAnchor.constraint(equalTo: scrollView.rightAnchor),
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             stackView.widthAnchor.constraint(equalToConstant: screenWidth)
         ])
@@ -151,12 +150,10 @@ class ManageViewController: UIViewController {
 
         let okAction = UIAlertAction(title: "OK", style: .default) { [self] action in
             if let textField = alert.textFields?.first {
-                // Access the text entered by the user
                 if let enteredText = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !enteredText.isEmpty {
                     
                     print("Entered text: \(enteredText)")
                     
-                    // Do something with the entered text
                     DispatchQueue.main.async {
                         self.checkEnteredCity(for: enteredText)
                         self.height = AddCity.addCity.count
@@ -198,13 +195,10 @@ class ManageViewController: UIViewController {
     }
     
     func updateTableViewHeight() {
-        // Calculate the new height based on the number of rows
         height = AddCity.addCity.count
         let newHeight = CGFloat(height * 50)
-        // Update the height constraint
         heightConstraint.constant = newHeight
 
-        // Animate the change
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }

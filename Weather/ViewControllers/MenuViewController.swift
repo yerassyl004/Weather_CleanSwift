@@ -12,7 +12,7 @@ protocol ManageDelegate: AnyObject {
 }
 
 protocol MenuDelegate: AnyObject {
-    func didSelectMenuItem()
+    func didSelectMenuItem(city: String)
 }
 
 
@@ -21,6 +21,8 @@ class MenuViewController: UIViewController{
     private var heightConstraint: NSLayoutConstraint!
     let menuWidth = UIScreen.main.bounds.width - 100
     let manageVC = ManageViewController()
+    var houryForecast: [DatumHourly] = []
+    
     weak var menuDelegate: MenuDelegate?
     //    let conVC = ContainerViewController()
     weak var delegate: ManageDelegate?
@@ -155,11 +157,27 @@ class MenuViewController: UIViewController{
     
     
     @objc func manageButtonTapped() {
-        // Present the ManageViewController
-//        delegate?.didTapped()
-//        menuDelegate?.didSelectMenuItem()
         manageVC.modalPresentationStyle = .fullScreen
         present(manageVC, animated: true)
+    }
+    
+    func checkEnteredCity(for cityName: String) {
+        ApiManager.shared.fetchHourlyForecast(cityName: cityName) { result in
+            switch result {
+            case .success(let hourlyForecast):
+                DispatchQueue.main.async {
+                    self.houryForecast = hourlyForecast.data
+                    let name = hourlyForecast.cityName
+                    if let data = self.houryForecast.first {
+                        AddCity.addCity.append(.init(name: name, temperature: Int(data.temp), icon: data.weather.icon, currentCity: false))
+                        self.updateTableViewHeight()
+                        self.tableView.reloadData()
+                    }
+                }
+            case .failure(let error):
+                print("Error fetching hourly forecast: \(error)")
+            }
+        }
     }
 }
 
@@ -190,9 +208,9 @@ extension MenuViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = ViewController()
-        vc.currentCityName = AddCity.addCity[indexPath.row].name
+        let city = AddCity.addCity[indexPath.row].name
         print(vc.currentCityName)
-        menuDelegate?.didSelectMenuItem()
+        menuDelegate?.didSelectMenuItem(city: city)
     }
 }
 
@@ -201,11 +219,5 @@ extension MenuViewController: ManageViewControllerDelegate {
         print("Updated Height")
         updateTableViewHeight()
         tableView.reloadData()
-    }
-}
-
-extension MenuViewController: MenuDelegate {
-    func didSelectMenuItem() {
-        print("Hello Hello")
     }
 }

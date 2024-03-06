@@ -80,25 +80,13 @@ extension ContainerViewController: HomeViewControllerDelegate {
 extension ContainerViewController: ManageDelegate {
     func didTapped() {
         print("Did tapped")
-//        menuButtonDidTapped()
-//        print("Did tapped")
-//        let vc = ManageViewController()
-//        homeVC.addChild(vc)
-//        homeVC.view.addSubview(vc.view)
-//        vc.view.frame = view.frame
-//        vc.didMove(toParent: homeVC)
-        
-        //        print("tapped")
-        //        // Handle the menu item selection
-        //        menuButtonDidTapped()
-        //        let manageVC = ManageViewController() // Replace with your actual view controller
-        //        navVC?.pushViewController(manageVC, animated: true)
-        //        present(ManageViewController(), animated: true)
     }
 }
 
 extension ContainerViewController: MenuDelegate {
-    func didSelectMenuItem() {
+    func didSelectMenuItem(city: String) {
+        homeVC.currentCityName = city
+        homeVC.viewWillAppear(true)
         print("Tapped Menu")
         menuState = .opened
         menuButtonDidTapped()
