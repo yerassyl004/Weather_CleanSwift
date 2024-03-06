@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Alamofire
 
 class ApiManager {
     
@@ -14,78 +15,40 @@ class ApiManager {
     private init() {}
     
     private let apiKey = "767697f89fc6497ba92b089b1904da3f"
-    private let baseURL = "https://api.weatherbit.io/v2.0/forecast/hourly"
     
     func fetchHourlyForecast(cityName: String, completion: @escaping (Result<WelcomeHourly, Error>) -> Void) {
-        let encodedCityName = cityName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let urlString = "\(baseURL)?city=\(encodedCityName)&key=\(apiKey)"
+        let baseURL = "https://api.weatherbit.io/v2.0/forecast/hourly"
         
-        if let url = URL(string: urlString) {
-            let session = URLSession(configuration: .default)
-            let dataTask = session.dataTask(with: url) { (data, response, error) in
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-                
-                guard let data = data else {
-                    let noDataError = NSError(domain: "ApiManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "No data received"])
-                    completion(.failure(noDataError))
-                    return
-                }
-                
-                do {
-                    let decoder = JSONDecoder()
-                    let forecastData = try decoder.decode(WelcomeHourly.self, from: data)
-                    completion(.success(forecastData))
-                } catch {
-                    completion(.failure(error))
-                }
+        let parameters: [String: Any] = [
+            "city": cityName,
+            "key": apiKey
+        ]
+        
+        AF.request(baseURL, parameters: parameters).responseDecodable(of: WelcomeHourly.self) { response in
+            switch response.result {
+            case .success(let forecastData):
+                completion(.success(forecastData))
+            case .failure(let error):
+                completion(.failure(error))
             }
-            
-            dataTask.resume()
         }
     }
-    
     
     func fetchWeeklyForecastData(for cityName: String, completion: @escaping (Result<WelcomeWeekly, Error>) -> Void) {
-        let apiKey = "767697f89fc6497ba92b089b1904da3f"
-        let urlString = "https://api.weatherbit.io/v2.0/forecast/daily?city=\(cityName)&key=\(apiKey)"
+        let baseURL = "https://api.weatherbit.io/v2.0/forecast/daily"
         
-        if let url = URL(string: urlString) {
-            let session = URLSession(configuration: .default)
-            let dataTask = session.dataTask(with: url) { (data, response, error) in
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-                
-                guard let data = data else {
-                    let dataError = NSError(domain: "com.example.WeatherApp", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
-                    completion(.failure(dataError))
-                    return
-                }
-                
-                do {
-                    let decoder = JSONDecoder()
-                    let weeklyForecastData = try decoder.decode(WelcomeWeekly.self, from: data)
-                    completion(.success(weeklyForecastData))
-                } catch {
-                    completion(.failure(error))
-                }
+        let parameters: [String: Any] = [
+            "city": cityName,
+            "key": apiKey
+        ]
+        
+        AF.request(baseURL, parameters: parameters).responseDecodable(of: WelcomeWeekly.self) { response in
+            switch response.result {
+            case .success(let forecastDate):
+                completion(.success(forecastDate))
+            case .failure(let error):
+                completion(.failure(error))
             }
-            
-            dataTask.resume()
         }
     }
-    
-    func fetchCurrentWeather(for cityName: String, completion: @escaping (WelcomeDayly?) -> Void) {
-        
-    }
-}
-
-enum NetworkError: Error {
-    case invalidURL
-    case noData
-    // Add more error cases as needed
 }

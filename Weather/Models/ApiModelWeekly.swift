@@ -57,7 +57,6 @@ struct DatumWeekly: Codable {
     let clouds, cloudsHi, cloudsLow, cloudsMid: Int
     let datetime: String
     let dewpt, highTemp, lowTemp: Double
-    let maxDhi: JSONNull?
     let maxTemp, minTemp, moonPhase, moonPhaseLunation: Double
     let moonriseTs, moonsetTs: Int
     let ozone: Double
@@ -86,7 +85,6 @@ struct DatumWeekly: Codable {
         case datetime, dewpt
         case highTemp = "high_temp"
         case lowTemp = "low_temp"
-        case maxDhi = "max_dhi"
         case maxTemp = "max_temp"
         case minTemp = "min_temp"
         case moonPhase = "moon_phase"
@@ -112,33 +110,4 @@ struct DatumWeekly: Codable {
 struct WeatherWeekly: Codable {
     let icon, description: String
     let code: Int
-}
-
-// MARK: - Encode/decode helpers
-
-class JSONNullWeekly: Codable, Hashable {
-    
-    
-
-    public static func == (lhs: JSONNullWeekly, rhs: JSONNullWeekly) -> Bool {
-        return true
-    }
-
-    public var hashValue: Int {
-        return 0
-    }
-
-    public init() {}
-
-    public required init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if !container.decodeNil() {
-            throw DecodingError.typeMismatch(JSONNull.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for JSONNull"))
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encodeNil()
-    }
 }

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import CoreLocation
+import SnapKit
 
 protocol HomeViewControllerDelegate: AnyObject {
     func menuButtonDidTapped()
@@ -15,7 +15,7 @@ protocol HomeViewControllerDelegate: AnyObject {
 let screenWidth = UIScreen.main.bounds.size.width
 let screenHeight = UIScreen.main.bounds.size.height
 
-final class ViewController: UIViewController, CLLocationManagerDelegate {
+final class ViewController: UIViewController {
     
     // MARK: - UI
     var currentCityName: String = "Almaty"
@@ -136,7 +136,7 @@ final class ViewController: UIViewController, CLLocationManagerDelegate {
     func dataOfWeek() -> [DatumWeekly]{
         let firstSevenArticles: [DatumWeekly] = Array(weeklyForecast.prefix(10))
         for article in firstSevenArticles {
-            weeklyForecast.append(DatumWeekly(appMaxTemp: article.appMaxTemp, appMinTemp: article.appMinTemp, clouds: article.clouds, cloudsHi: article.cloudsHi, cloudsLow: article.cloudsLow, cloudsMid: article.cloudsMid, datetime: article.datetime, dewpt: article.dewpt, highTemp: article.highTemp, lowTemp: article.lowTemp, maxDhi: article.maxDhi, maxTemp: article.maxTemp, minTemp: article.minTemp, moonPhase: article.moonPhase, moonPhaseLunation: article.moonPhaseLunation, moonriseTs: article.moonriseTs, moonsetTs: article.moonsetTs, ozone: article.ozone, pop: article.pop, precip: article.precip, pres: article.pres, rh: article.rh, slp: article.slp, snow: article.snow, snowDepth: article.snowDepth, sunriseTs: article.sunriseTs, sunsetTs: article.sunsetTs, temp: article.temp, ts: article.ts, uv: article.uv, validDate: article.validDate, vis: article.vis, weather: article.weather, windCdir: article.windCdir, windCdirFull: article.windCdirFull, windDir: article.windDir, windGustSpd: article.windGustSpd, windSpd: article.windSpd))
+            weeklyForecast.append(DatumWeekly(appMaxTemp: article.appMaxTemp, appMinTemp: article.appMinTemp, clouds: article.clouds, cloudsHi: article.cloudsHi, cloudsLow: article.cloudsLow, cloudsMid: article.cloudsMid, datetime: article.datetime, dewpt: article.dewpt, highTemp: article.highTemp, lowTemp: article.lowTemp, maxTemp: article.maxTemp, minTemp: article.minTemp, moonPhase: article.moonPhase, moonPhaseLunation: article.moonPhaseLunation, moonriseTs: article.moonriseTs, moonsetTs: article.moonsetTs, ozone: article.ozone, pop: article.pop, precip: article.precip, pres: article.pres, rh: article.rh, slp: article.slp, snow: article.snow, snowDepth: article.snowDepth, sunriseTs: article.sunriseTs, sunsetTs: article.sunsetTs, temp: article.temp, ts: article.ts, uv: article.uv, validDate: article.validDate, vis: article.vis, weather: article.weather, windCdir: article.windCdir, windCdirFull: article.windCdirFull, windDir: article.windDir, windGustSpd: article.windGustSpd, windSpd: article.windSpd))
         }
         return firstSevenArticles
     }
@@ -183,7 +183,6 @@ final class ViewController: UIViewController, CLLocationManagerDelegate {
             switch result {
             case .success(let hourlyForecast):
                 self.houryForecast = hourlyForecast.data
-                // Process the fetched data here
                 if let data = hourlyForecast.data.first {
                     DispatchQueue.main.async {
                         self.collectionView.reloadData()
@@ -211,7 +210,6 @@ final class ViewController: UIViewController, CLLocationManagerDelegate {
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
                         self.hightLowLabel.text = "H:\(Int(round(data.maxTemp)))° L:\(Int(round(data.minTemp)))°"
-//                        self.cityTemperatureLabel.text = "\(Int(round(data.temp)))°"
                         self.currentWeatherLabel.text = data.weather.description
                     }
                 }
@@ -219,60 +217,6 @@ final class ViewController: UIViewController, CLLocationManagerDelegate {
             case .failure(let error):
                 print("Error fetching data: \(error)")
             }
-        }
-    }
-    
-    
-    
-    func fetchWeeklyForecastData() {
-        let apiKey = "767697f89fc6497ba92b089b1904da3f"
-        let urlString = "https://api.weatherbit.io/v2.0/forecast/daily?lat=42.3205&lon=69.5876&key=\(apiKey)"
-        
-        if let url = URL(string: urlString) {
-            let session = URLSession(configuration: .default)
-            let dataTask = session.dataTask(with: url) { (data, response, error) in
-                if let error = error {
-                    print("Error: \(error)")
-                    return
-                }
-                guard let data = data else {
-                    print("No data received")
-                    return
-                }
-                
-                do {
-                    let decoder = JSONDecoder()
-                    let weeklyForecastData = try decoder.decode(WelcomeWeekly.self, from: data)
-                    
-                    self.weeklyForecast = weeklyForecastData.data
-                    
-                    
-                    print(self.weeklyForecast)
-                    
-                    for dailyForecast in weeklyForecastData.data {
-                        print("Date: \(dailyForecast.datetime)")
-                        print("Temperature: \(dailyForecast.temp)°C")
-                        print("Description: \(dailyForecast.weather.description)")
-                        print("-----")
-                        
-                    }
-                    
-                    DispatchQueue.main.async {
-                        self.collectionView.reloadData()
-                        self.tableView.reloadData()
-                        self.cityNameLabel.text = weeklyForecastData.cityName
-                        
-                        if let dailyForecast = weeklyForecastData.data.first {
-                            self.hightLowLabel.text = "H:\(dailyForecast.maxTemp)° L:\(dailyForecast.minTemp)°"
-                        }
-                    }
-                    
-                } catch {
-                    print("Error decoding JSON: \(error)")
-                }
-            }
-            
-            dataTask.resume()
         }
     }
    
