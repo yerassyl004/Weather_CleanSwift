@@ -387,7 +387,7 @@ final class ViewController: UIViewController, CLLocationManagerDelegate {
 
         if let inputDate = dateFormatter.date(from: date) {
             let dayFormatter = DateFormatter()
-            dayFormatter.dateFormat = "EEEE" // This will give you the day's name
+            dayFormatter.dateFormat = "EEEE"
 
             let dayName = dayFormatter.string(from: inputDate)
             return dayName
@@ -422,7 +422,6 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
         }
         
         cell.humidityLabel.text = "\(data.rh)%"
-//        cell.temperatureLabel.text = String(data.temp)
         cell.timeLabel.text = formattedDateString
         cell.temperatureLabel.text = "\(Int(round(data.temp)))°"
         cell.weatherImage.image = UIImage(named: "\(data.weather.icon)")
@@ -431,6 +430,8 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     }
     
 }
+
+// MARK: - Collection Delegate
 extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let cellWidth: CGFloat = 60
@@ -440,8 +441,7 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     
 }
 
-// MARK: TableView
-
+// MARK: - TableView
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         dataOfWeek().count
