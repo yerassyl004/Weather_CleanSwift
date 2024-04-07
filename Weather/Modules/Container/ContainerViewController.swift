@@ -8,8 +8,7 @@
 import UIKit
 import SnapKit
 
-class ContainerViewController: UIViewController {
-    
+final class ContainerViewController: UIViewController {
     
     enum MenuState {
         case opened

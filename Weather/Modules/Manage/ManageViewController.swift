@@ -11,7 +11,7 @@ protocol ManageViewControllerDelegate: AnyObject {
     func didUpdateCities()
 }
 
-class ManageViewController: UIViewController {
+final class ManageViewController: UIViewController {
     
     weak var delegateData: ManageViewControllerDelegate?
     var houryForecast: [DatumHourly] = []

@@ -75,7 +75,7 @@ enum Description: String, Codable {
     case fewClouds = "Few clouds"
     case mixSnowRain = "Mix snow/rain"
     case overcastClouds = "Overcast clouds"
-    case heavyRain = "Heavy rain" // Add this line for the problematic value
+    case heavyRain = "Heavy rain"
 }
 
 enum Icon: String, Codable {
@@ -84,6 +84,6 @@ enum Icon: String, Codable {
     case c04N = "c04n"
     case d02D = "d02d"
     case s04D = "s04d"
-    case r03N = "r03n" // Add this line for the problematic value
-    case r02N = "r02n" // Add this line for the problematic value
+    case r03N = "r03n"
+    case r02N = "r02n"
 }

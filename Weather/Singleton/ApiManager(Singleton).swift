@@ -8,7 +8,7 @@
 import Foundation
 import Alamofire
 
-class ApiManager {
+final class ApiManager {
     
     static let shared = ApiManager()
     
