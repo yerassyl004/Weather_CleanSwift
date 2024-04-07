@@ -14,7 +14,7 @@ final class ApiManager {
     
     private init() {}
     
-    private let apiKey = "767697f89fc6497ba92b089b1904da3f"
+    private let apiKey = "05637ba264104770a9b2f9c4437daba2"
     
     func fetchHourlyForecast(cityName: String, completion: @escaping (Result<WelcomeHourly, Error>) -> Void) {
         let baseURL = "https://api.weatherbit.io/v2.0/forecast/hourly"
