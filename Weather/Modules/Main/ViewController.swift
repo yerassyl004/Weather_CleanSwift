@@ -110,6 +110,7 @@ final class ViewController: UIViewController {
         let view = UITableView()
         view.backgroundColor = UIColor(named: "cloudColor")
         view.layer.cornerRadius = 15
+        view.isUserInteractionEnabled = false
         view.register(TableViewCell.self, forCellReuseIdentifier: "cell")
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -125,6 +126,7 @@ final class ViewController: UIViewController {
         backgroundImage()
         setupScroll()
         setupView()
+//        viewModel = MainViewModel(weeklyForecast: weeklyForecast)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -133,7 +135,7 @@ final class ViewController: UIViewController {
         fetchWeeklyForecastData(for: currentCityName)
     }
     
-    func dataOfWeek() -> [DatumWeekly]{
+    func dataOfWeek() -> [DatumWeekly] {
         let firstSevenArticles: [DatumWeekly] = Array(weeklyForecast.prefix(10))
         for article in firstSevenArticles {
             weeklyForecast.append(DatumWeekly(appMaxTemp: article.appMaxTemp, appMinTemp: article.appMinTemp, clouds: article.clouds, cloudsHi: article.cloudsHi, cloudsLow: article.cloudsLow, cloudsMid: article.cloudsMid, datetime: article.datetime, dewpt: article.dewpt, highTemp: article.highTemp, lowTemp: article.lowTemp, maxTemp: article.maxTemp, minTemp: article.minTemp, moonPhase: article.moonPhase, moonPhaseLunation: article.moonPhaseLunation, moonriseTs: article.moonriseTs, moonsetTs: article.moonsetTs, ozone: article.ozone, pop: article.pop, precip: article.precip, pres: article.pres, rh: article.rh, slp: article.slp, snow: article.snow, snowDepth: article.snowDepth, sunriseTs: article.sunriseTs, sunsetTs: article.sunsetTs, temp: article.temp, ts: article.ts, uv: article.uv, validDate: article.validDate, vis: article.vis, weather: article.weather, windCdir: article.windCdir, windCdirFull: article.windCdirFull, windDir: article.windDir, windGustSpd: article.windGustSpd, windSpd: article.windSpd))
@@ -141,7 +143,7 @@ final class ViewController: UIViewController {
         return firstSevenArticles
     }
     
-    func dataOfHour() -> [DatumHourly]{
+    func dataOfHour() -> [DatumHourly] {
         let firstSevenArticles: [DatumHourly] = Array(houryForecast.prefix(24))
         for article in firstSevenArticles {
             houryForecast.append(DatumHourly(appTemp: article.appTemp, clouds: article.clouds, cloudsHi: article.cloudsHi, cloudsLow: article.cloudsLow, cloudsMid: article.cloudsMid, datetime: article.datetime, dewpt: article.dewpt, dhi: article.dhi, dni: article.dni, ghi: article.ghi, ozone: article.ozone, pod: article.pod, pop: article.pop, precip: article.precip, pres: article.pres, rh: article.rh, slp: article.slp, snow: article.snow, snowDepth: article.snowDepth, solarRAD: article.solarRAD, temp: article.temp, timestampLocal: article.timestampLocal, timestampUTC: article.timestampUTC, ts: article.ts, uv: article.uv, vis: article.vis, weather: WeatherHourly(icon: article.weather.icon, description: article.weather.description, code: article.weather.code), windCdir: article.windCdir, windCdirFull: article.windCdirFull, windDir: article.windDir, windGustSpd: article.windSpd, windSpd: article.windSpd))
@@ -223,12 +225,9 @@ final class ViewController: UIViewController {
     func setupScroll() {
         view.addSubview(scrollView)
         
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
+        scrollView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         scrollView.addSubview(stackView)
         
         NSLayoutConstraint.activate([
@@ -238,6 +237,10 @@ final class ViewController: UIViewController {
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
         ])
+        stackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalToSuperview()
+        }
         setupContainers()
     }
     
@@ -246,7 +249,7 @@ final class ViewController: UIViewController {
         stackView.addArrangedSubview(cityNameLabel)
         NSLayoutConstraint.activate([
             cityNameLabel.topAnchor.constraint(equalTo: stackView.topAnchor),
-            cityNameLabel.heightAnchor.constraint(equalToConstant: 30)
+            cityNameLabel.heightAnchor.constraint(equalToConstant: 35)
         ])
         
         stackView.addArrangedSubview(cityTemperatureLabel)
@@ -388,13 +391,12 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - TableView
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        dataOfWeek().count
+        return dataOfWeek().count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TableViewCell
         let data = dataOfWeek()[indexPath.row]
-        
         let minTemp = Int(round(data.minTemp))
         let maxTemp = Int(round(data.maxTemp))
         

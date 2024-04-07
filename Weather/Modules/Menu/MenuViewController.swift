@@ -16,7 +16,7 @@ protocol MenuDelegate: AnyObject {
 }
 
 
-class MenuViewController: UIViewController{
+final class MenuViewController: UIViewController{
     
     private var heightConstraint: NSLayoutConstraint!
     let menuWidth = UIScreen.main.bounds.width - 100
@@ -63,9 +63,6 @@ class MenuViewController: UIViewController{
     }()
     let homeVC = ViewController()
     var navVC: UINavigationController?
-    //    var navigationController: UINavigationController?
-    
-    //    let navVC = UINavigationController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -207,6 +204,7 @@ extension MenuViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         let vc = ViewController()
         let city = AddCity.addCity[indexPath.row].name
         print(vc.currentCityName)
