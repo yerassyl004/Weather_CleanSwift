@@ -12,19 +12,26 @@ protocol HomeViewControllerDelegate: AnyObject {
     func menuButtonDidTapped()
 }
 
+protocol MainDisplayLogic: AnyObject {
+    func displayHourly(forecast: WelcomeHourly)
+    func displayWeekly(forecast: WelcomeWeekly)
+}
+
 let screenWidth = UIScreen.main.bounds.size.width
 let screenHeight = UIScreen.main.bounds.size.height
 
-final class ViewController: UIViewController {
+final class ViewController: UIViewController, MainDisplayLogic {
     
     // MARK: - UI
-    var currentCityName: String = "Almaty"
+    var currentCityName = "London"
     weak var delegate: HomeViewControllerDelegate?
     weak var manageVCDelegate: ManageViewControllerDelegate?
     
     var weeklyForecast: [DatumWeekly] = []
     var weeklyForecastForTable: [DatumWeekly] = []
     var houryForecast: [DatumHourly] = []
+    
+    var interactor: MainBusinessLogic?
     
     let cityNameLabel: UILabel = {
         let label = UILabel()
@@ -90,7 +97,19 @@ final class ViewController: UIViewController {
         return view
     }()
     
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.contentInsetAdjustmentBehavior = .never
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.layer.cornerRadius = 15
+        collectionView.backgroundColor = UIColor(named: "cloudColor")
+        return collectionView
+    }()
     
     let containerView: UIView = {
         let view = UIView()
@@ -106,33 +125,70 @@ final class ViewController: UIViewController {
         return view
     }()
     
-    let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let view = UITableView()
         view.backgroundColor = UIColor(named: "cloudColor")
         view.layer.cornerRadius = 15
         view.isUserInteractionEnabled = false
         view.register(TableViewCell.self, forCellReuseIdentifier: "cell")
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.isScrollEnabled = false
         return view
     }()
     
     // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        menuButton()
-        print("Text")
-        print("New Item")
+        setupViews()
+        setupConstraints()
+        setupArchitecture()
+        setupNavigation()
         backgroundImage()
-        setupScroll()
-        setupView()
-//        viewModel = MainViewModel(weeklyForecast: weeklyForecast)
+        setupLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        fetchDataForCity(cityName: currentCityName)
-        fetchWeeklyForecastData(for: currentCityName)
+        let queue = DispatchQueue(label: "fetchData", attributes: .concurrent)
+        queue.async {
+            self.interactor?.fetchDataForCity(for: self.currentCityName)
+            self.interactor?.fetchDataForWeek(for: self.currentCityName)
+        }
+    }
+    
+    func displayHourly(forecast: WelcomeHourly) {
+        let datum = forecast.data
+        houryForecast = forecast.data
+        for data in datum {
+            DispatchQueue.main.async {
+                self.cityTemperatureLabel.text = "\(Int(round(data.temp)))°"
+                self.cityFeelsLikeTemperatureLabel.text = "Feels Like \(Int(round(data.appTemp)))°"
+                self.cityNameLabel.text = forecast.cityName
+                self.collectionView.reloadData()
+            }
+        }
+    }
+    
+    func displayWeekly(forecast: WelcomeWeekly) {
+        self.weeklyForecast = forecast.data
+        
+        if let data = forecast.data.first {
+            DispatchQueue.main.async {
+                self.hightLowLabel.text = "H:\(Int(round(data.maxTemp)))° L:\(Int(round(data.minTemp)))°"
+                self.currentWeatherLabel.text = data.weather.description
+                self.tableView.reloadData()
+            }
+        }
+    }
+    
+    private func setupArchitecture() {
+        let viewController = self
+        let interactor = MainInteractor()
+        let presenter = MainPresenter()
+        viewController.interactor = interactor
+        interactor.presenter = presenter
+        presenter.viewController = viewController
+        interactor.fetchDataForCity(for: currentCityName)
     }
     
     func dataOfWeek() -> [DatumWeekly] {
@@ -151,13 +207,30 @@ final class ViewController: UIViewController {
         return firstSevenArticles
     }
     
-    func menuButton() {
+    func setupNavigation() {
         let leftButton = UIBarButtonItem(image: UIImage(systemName: "list.dash"),
                                      style: .done,
                                      target: self,
                                      action: #selector(didTapMenuButton))
         navigationItem.leftBarButtonItem = leftButton
         
+    }
+    
+    // MARK: - SetupViews
+    private func setupViews() {
+        view.backgroundColor = .systemBackground
+        
+        [cityNameLabel, cityTemperatureLabel, currentWeatherLabel, hightLowLabel, cityFeelsLikeTemperatureLabel, containerView, containerTableView].forEach {
+            stackView.addArrangedSubview($0)
+        }
+        containerView.addSubview(collectionView)
+        containerTableView.addSubview(tableView)
+        
+        scrollView.addSubview(stackView)
+        view.addSubview(scrollView)
+        
+        tableView.delegate = self
+        tableView.dataSource = self
     }
     
     @objc func didTapMenuButton() {
@@ -171,161 +244,72 @@ final class ViewController: UIViewController {
         view.addSubview(backgroundImage)
         view.sendSubviewToBack(backgroundImage)
         
-        backgroundImage.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            backgroundImage.topAnchor.constraint(equalTo: view.topAnchor),
-            backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            backgroundImage.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            backgroundImage.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-    }
-    
-    func fetchDataForCity(cityName: String) {
-        ApiManager.shared.fetchHourlyForecast(cityName: cityName) { result in
-            switch result {
-            case .success(let hourlyForecast):
-                self.houryForecast = hourlyForecast.data
-                if let data = hourlyForecast.data.first {
-                    DispatchQueue.main.async {
-                        self.collectionView.reloadData()
-                        self.cityTemperatureLabel.text = "\(Int(round(data.temp)))°"
-                        self.cityFeelsLikeTemperatureLabel.text = "Feels Like \(Int(round(data.appTemp)))°"
-                        self.cityNameLabel.text = hourlyForecast.cityName
-                        print("ICON ICON \(data.weather.icon)")
-                    }
-                }
-                print(self.houryForecast)
-            case .failure(let error):
-                print("Error fetching hourly forecast: \(error)")
-            }
+        backgroundImage.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
     
-    func fetchWeeklyForecastData(for cityName: String) {
-        ApiManager.shared.fetchWeeklyForecastData(for: cityName) { result in
-            switch result {
-            case .success(let weeklyForecastData):
-                self.weeklyForecast = weeklyForecastData.data
-                print(self.weeklyForecast)
-                
-                if let data = weeklyForecastData.data.first {
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                        self.hightLowLabel.text = "H:\(Int(round(data.maxTemp)))° L:\(Int(round(data.minTemp)))°"
-                        self.currentWeatherLabel.text = data.weather.description
-                    }
-                }
-                
-            case .failure(let error):
-                print("Error fetching data: \(error)")
-            }
-        }
-    }
-   
-    func setupScroll() {
-        view.addSubview(scrollView)
+    func setupConstraints() {
         
         scrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        scrollView.addSubview(stackView)
-        
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            stackView.leftAnchor.constraint(equalTo: scrollView.leftAnchor),
-            stackView.rightAnchor.constraint(equalTo: scrollView.rightAnchor),
-            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-        ])
         stackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
             make.width.equalToSuperview()
         }
-        setupContainers()
-    }
-    
-    func setupContainers() {
+
+        cityNameLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.height.equalTo(35)
+        }
         
-        stackView.addArrangedSubview(cityNameLabel)
-        NSLayoutConstraint.activate([
-            cityNameLabel.topAnchor.constraint(equalTo: stackView.topAnchor),
-            cityNameLabel.heightAnchor.constraint(equalToConstant: 35)
-        ])
+        cityTemperatureLabel.snp.makeConstraints { make in
+            make.height.equalTo(80)
+        }
+        currentWeatherLabel.snp.makeConstraints { make in
+            make.height.equalTo(20)
+        }
         
-        stackView.addArrangedSubview(cityTemperatureLabel)
-        NSLayoutConstraint.activate([
-            cityTemperatureLabel.heightAnchor.constraint(equalToConstant: 80)
-        ])
+        hightLowLabel.snp.makeConstraints { make in
+            make.height.equalTo(20)
+        }
         
-        stackView.addArrangedSubview(currentWeatherLabel)
-        NSLayoutConstraint.activate([
-            currentWeatherLabel.heightAnchor.constraint(equalToConstant: 20)
-        ])
+        cityFeelsLikeTemperatureLabel.snp.makeConstraints { make in
+            make.height.equalTo(20)
+        }
         
-        stackView.addArrangedSubview(hightLowLabel)
-        NSLayoutConstraint.activate([
-            hightLowLabel.heightAnchor.constraint(equalToConstant: 20)
-        ])
+        containerView.snp.makeConstraints { make in
+            make.height.equalTo(140)
+            make.width.equalTo(screenWidth - 20)
+            make.leading.equalToSuperview().offset(10)
+            make.trailing.equalToSuperview().offset(-10)
+        }
         
-        stackView.addArrangedSubview(cityFeelsLikeTemperatureLabel)
-        NSLayoutConstraint.activate([
-            cityFeelsLikeTemperatureLabel.heightAnchor.constraint(equalToConstant: 20),
-        ])
+        collectionView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         
-        stackView.addArrangedSubview(containerView)
-        NSLayoutConstraint.activate([
-            containerView.heightAnchor.constraint(equalToConstant: 140),
-            containerView.widthAnchor.constraint(equalToConstant: screenWidth - 20),
-            containerView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
-            containerView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
-        ])
-        containerView.addSubview(collectionView)
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: containerView.topAnchor),
-            collectionView.leftAnchor.constraint(equalTo: containerView.leftAnchor),
-            collectionView.rightAnchor.constraint(equalTo: containerView.rightAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
-            
-        ])
         containerView.backgroundColor = UIColor(named: "cloudColor")
         containerTableView.backgroundColor = UIColor(named: "cloudColor")
-        stackView.addArrangedSubview(containerTableView)
-        NSLayoutConstraint.activate([
-            containerTableView.heightAnchor.constraint(equalToConstant: 60 * 10),
-            containerTableView.widthAnchor.constraint(equalToConstant: screenWidth - 20),
-            containerTableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
-            containerTableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
-        ])
-        containerTableView.addSubview(tableView)
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: containerTableView.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: containerTableView.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: containerTableView.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: containerTableView.bottomAnchor),
-        ])
         
-        tableView.backgroundColor = .clear
+        containerTableView.snp.makeConstraints { make in
+            make.height.equalTo(60 * 10)
+            make.width.equalTo(screenWidth - 20)
+            make.leading.equalToSuperview().offset(10)
+            make.trailing.equalToSuperview().offset(-10)
+        }
+        tableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
-    func setupView() {
-        collectionView.contentInsetAdjustmentBehavior = .never
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.layer.cornerRadius = 15
-        collectionView.backgroundColor = UIColor(named: "cloudColor")
+    func setupLayout() {
         
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.isScrollEnabled = false
-        
-        let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 0
+        let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout
+        layout?.scrollDirection = .horizontal
+        layout?.minimumLineSpacing = 0
+        layout?.minimumInteritemSpacing = 0
     }
     
     func dayOfWeek(for date: String) -> String? {
