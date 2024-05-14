@@ -6,98 +6,95 @@
 //
 
 import UIKit
+import SnapKit
 
-class CollectionViewCell: UICollectionViewCell {
+final class CollectionViewCell: UICollectionViewCell {
     
-    let timeLabel: UILabel = {
+    private lazy var timeLabel: UILabel = {
         let label = UILabel()
         label.text = "11"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 15)
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    let humidityLabel: UILabel = {
+    private lazy var humidityLabel: UILabel = {
         let label = UILabel()
         label.text = ""
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 12)
         label.textColor = .systemBlue
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    let weatherImage: UIImageView = {
+    private lazy var weatherImage: UIImageView = {
         let image = UIImageView()
         image.contentMode = .scaleAspectFit
         image.clipsToBounds = true
         image.image = UIImage(systemName: "snowflake")
-        image.translatesAutoresizingMaskIntoConstraints = false
         return image
     }()
     
-    let temperatureLabel: UILabel = {
+    private lazy var temperatureLabel: UILabel = {
         let label = UILabel()
         label.text = "11"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 25)
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        setupViews()
         setupConstraints()
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        setupConstraints()
     }
     
-    func setupConstraints() {
-        
+    private func setupViews() {
         let blurEffect = UIBlurEffect(style: .light)
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         contentView.addSubview(blurEffectView)
-        blurEffectView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            blurEffectView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            blurEffectView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            blurEffectView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            blurEffectView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
-        ])
+        blurEffectView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         
         contentView.addSubview(timeLabel)
         contentView.addSubview(humidityLabel)
         contentView.addSubview(weatherImage)
         contentView.addSubview(temperatureLabel)
-        
-        NSLayoutConstraint.activate([
-            timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-            timeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            timeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-        ])
-        
-        NSLayoutConstraint.activate([
-            weatherImage.topAnchor.constraint(equalTo: timeLabel.bottomAnchor),
-            weatherImage.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            weatherImage.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            weatherImage.widthAnchor.constraint(equalToConstant: 40),
-            weatherImage.heightAnchor.constraint(equalToConstant: 35),
-        ])
-        
-        NSLayoutConstraint.activate([
-            humidityLabel.topAnchor.constraint(equalTo: weatherImage.bottomAnchor),
-            humidityLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            humidityLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-        ])
-        
-        NSLayoutConstraint.activate([
-            temperatureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
-            temperatureLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            temperatureLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-        ])
+    }
+    
+    func setupConstraints() {
+        timeLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(10)
+            make.leading.trailing.equalToSuperview()
+        }
+
+        weatherImage.snp.makeConstraints { make in
+            make.top.equalTo(timeLabel.snp.bottom)
+            make.leading.trailing.equalToSuperview()
+            make.width.equalTo(40)
+            make.height.equalTo(35)
+        }
+
+        humidityLabel.snp.makeConstraints { make in
+            make.top.equalTo(weatherImage.snp.bottom)
+            make.leading.trailing.equalToSuperview()
+        }
+
+        temperatureLabel.snp.makeConstraints { make in
+            make.bottom.equalToSuperview().offset(-10)
+            make.leading.trailing.equalToSuperview()
+        }
+    }
+    
+    public func configure(model: MainModel.HourlyModel) {
+        timeLabel.text = model.hour
+        weatherImage.image = model.image
+        humidityLabel.text = model.humidity
+        temperatureLabel.text = model.temp
     }
 }

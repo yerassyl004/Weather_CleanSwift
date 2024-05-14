@@ -13,16 +13,17 @@ protocol HomeViewControllerDelegate: AnyObject {
 }
 
 protocol MainDisplayLogic: AnyObject {
-    func displayHourly(forecast: WelcomeHourly)
-    func displayWeekly(forecast: WelcomeWeekly)
+    func displayHourlyForecast(forecast:  [MainModel.HourlyModel],
+                               currentForecast: MainModel.CurrentWeather)
+    func displayWeeklyData(data: [MainModel.DaylyModel])
 }
 
 let screenWidth = UIScreen.main.bounds.size.width
 let screenHeight = UIScreen.main.bounds.size.height
 
-final class ViewController: UIViewController, MainDisplayLogic {
+final class ViewController: UIViewController {
     
-    // MARK: - UI
+    // MARK: - Deps
     var currentCityName = "London"
     weak var delegate: HomeViewControllerDelegate?
     weak var manageVCDelegate: ManageViewControllerDelegate?
@@ -32,13 +33,15 @@ final class ViewController: UIViewController, MainDisplayLogic {
     var houryForecast: [DatumHourly] = []
     
     var interactor: MainBusinessLogic?
+    private var cellModel = [MainModel.DaylyModel]()
+    private var hourlyForecast = [MainModel.HourlyModel]()
     
+    // MARK: - UI
     let cityNameLabel: UILabel = {
         let label = UILabel()
         label.text = "City"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 30)
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -48,7 +51,6 @@ final class ViewController: UIViewController, MainDisplayLogic {
         label.textAlignment = .center
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 90, weight: .thin)
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -58,7 +60,6 @@ final class ViewController: UIViewController, MainDisplayLogic {
         label.textAlignment = .center
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 20)
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -67,7 +68,6 @@ final class ViewController: UIViewController, MainDisplayLogic {
         label.text = "Snow"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 20)
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -76,7 +76,6 @@ final class ViewController: UIViewController, MainDisplayLogic {
         label.text = "H:10 L:-5"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 20)
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -84,7 +83,6 @@ final class ViewController: UIViewController, MainDisplayLogic {
         let view = UIScrollView()
         view.isScrollEnabled = true
         view.alwaysBounceVertical = true
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -93,7 +91,6 @@ final class ViewController: UIViewController, MainDisplayLogic {
         view.axis = .vertical
         view.spacing = 10
         view.alignment = .center
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -105,7 +102,6 @@ final class ViewController: UIViewController, MainDisplayLogic {
         collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.layer.cornerRadius = 15
         collectionView.backgroundColor = UIColor(named: "cloudColor")
         return collectionView
@@ -114,14 +110,12 @@ final class ViewController: UIViewController, MainDisplayLogic {
     let containerView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 15
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     let containerTableView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 15
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -131,7 +125,6 @@ final class ViewController: UIViewController, MainDisplayLogic {
         view.layer.cornerRadius = 15
         view.isUserInteractionEnabled = false
         view.register(TableViewCell.self, forCellReuseIdentifier: "cell")
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.isScrollEnabled = false
         return view
     }()
@@ -150,34 +143,12 @@ final class ViewController: UIViewController, MainDisplayLogic {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let queue = DispatchQueue(label: "fetchData", attributes: .concurrent)
-        queue.async {
-            self.interactor?.fetchDataForCity(for: self.currentCityName)
+        let qu = DispatchQueue.global()
+        qu.async {
             self.interactor?.fetchDataForWeek(for: self.currentCityName)
         }
-    }
-    
-    func displayHourly(forecast: WelcomeHourly) {
-        let datum = forecast.data
-        houryForecast = forecast.data
-        for data in datum {
-            DispatchQueue.main.async {
-                self.cityTemperatureLabel.text = "\(Int(round(data.temp)))°"
-                self.cityFeelsLikeTemperatureLabel.text = "Feels Like \(Int(round(data.appTemp)))°"
-                self.cityNameLabel.text = forecast.cityName
-                self.collectionView.reloadData()
-            }
-        }
-    }
-    
-    func displayWeekly(forecast: WelcomeWeekly) {
-        self.weeklyForecast = forecast.data
-        
-        if let data = forecast.data.first {
-            DispatchQueue.main.async {
-                self.hightLowLabel.text = "H:\(Int(round(data.maxTemp)))° L:\(Int(round(data.minTemp)))°"
-                self.currentWeatherLabel.text = data.weather.description
-                self.tableView.reloadData()
-            }
+        queue.async {
+            self.interactor?.fetchDataForCity(for: self.currentCityName)
         }
     }
     
@@ -189,22 +160,6 @@ final class ViewController: UIViewController, MainDisplayLogic {
         interactor.presenter = presenter
         presenter.viewController = viewController
         interactor.fetchDataForCity(for: currentCityName)
-    }
-    
-    func dataOfWeek() -> [DatumWeekly] {
-        let firstSevenArticles: [DatumWeekly] = Array(weeklyForecast.prefix(10))
-        for article in firstSevenArticles {
-            weeklyForecast.append(DatumWeekly(appMaxTemp: article.appMaxTemp, appMinTemp: article.appMinTemp, clouds: article.clouds, cloudsHi: article.cloudsHi, cloudsLow: article.cloudsLow, cloudsMid: article.cloudsMid, datetime: article.datetime, dewpt: article.dewpt, highTemp: article.highTemp, lowTemp: article.lowTemp, maxTemp: article.maxTemp, minTemp: article.minTemp, moonPhase: article.moonPhase, moonPhaseLunation: article.moonPhaseLunation, moonriseTs: article.moonriseTs, moonsetTs: article.moonsetTs, ozone: article.ozone, pop: article.pop, precip: article.precip, pres: article.pres, rh: article.rh, slp: article.slp, snow: article.snow, snowDepth: article.snowDepth, sunriseTs: article.sunriseTs, sunsetTs: article.sunsetTs, temp: article.temp, ts: article.ts, uv: article.uv, validDate: article.validDate, vis: article.vis, weather: article.weather, windCdir: article.windCdir, windCdirFull: article.windCdirFull, windDir: article.windDir, windGustSpd: article.windGustSpd, windSpd: article.windSpd))
-        }
-        return firstSevenArticles
-    }
-    
-    func dataOfHour() -> [DatumHourly] {
-        let firstSevenArticles: [DatumHourly] = Array(houryForecast.prefix(24))
-        for article in firstSevenArticles {
-            houryForecast.append(DatumHourly(appTemp: article.appTemp, clouds: article.clouds, cloudsHi: article.cloudsHi, cloudsLow: article.cloudsLow, cloudsMid: article.cloudsMid, datetime: article.datetime, dewpt: article.dewpt, dhi: article.dhi, dni: article.dni, ghi: article.ghi, ozone: article.ozone, pod: article.pod, pop: article.pop, precip: article.precip, pres: article.pres, rh: article.rh, slp: article.slp, snow: article.snow, snowDepth: article.snowDepth, solarRAD: article.solarRAD, temp: article.temp, timestampLocal: article.timestampLocal, timestampUTC: article.timestampUTC, ts: article.ts, uv: article.uv, vis: article.vis, weather: WeatherHourly(icon: article.weather.icon, description: article.weather.description, code: article.weather.code), windCdir: article.windCdir, windCdirFull: article.windCdirFull, windDir: article.windDir, windGustSpd: article.windSpd, windSpd: article.windSpd))
-        }
-        return firstSevenArticles
     }
     
     func setupNavigation() {
@@ -311,51 +266,19 @@ final class ViewController: UIViewController, MainDisplayLogic {
         layout?.minimumLineSpacing = 0
         layout?.minimumInteritemSpacing = 0
     }
-    
-    func dayOfWeek(for date: String) -> String? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-
-        if let inputDate = dateFormatter.date(from: date) {
-            let dayFormatter = DateFormatter()
-            dayFormatter.dateFormat = "EEEE"
-
-            let dayName = dayFormatter.string(from: inputDate)
-            return dayName
-        } else {
-            return nil
-        }
-    }
 }
 
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataOfHour().count
+        return hourlyForecast.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! CollectionViewCell
-        let data = dataOfHour()[indexPath.row]
-        
-        let dateFormatterInput = DateFormatter()
-        dateFormatterInput.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-
-        let dateFormatterOutput = DateFormatter()
-        dateFormatterOutput.dateFormat = "HH:mm"
-
-        var formattedDateString = ""
-        
-        if let date = dateFormatterInput.date(from: data.timestampLocal) {
-            formattedDateString = dateFormatterOutput.string(from: date)
-            print("Converted Date String: \(formattedDateString)")
-        } else {
-            print("Invalid date string format")
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? CollectionViewCell else {
+            return UICollectionViewCell()
         }
-        
-        cell.humidityLabel.text = "\(data.rh)%"
-        cell.timeLabel.text = formattedDateString
-        cell.temperatureLabel.text = "\(Int(round(data.temp)))°"
-        cell.weatherImage.image = UIImage(named: "\(data.weather.icon)")
+        let model = hourlyForecast[indexPath.row]
+        cell.configure(model: model)
         cell.backgroundColor = UIColor(named: "cloudColor")
         return cell
     }
@@ -375,36 +298,48 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - TableView
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataOfWeek().count
+        return cellModel.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TableViewCell
-        let data = dataOfWeek()[indexPath.row]
-        let minTemp = Int(round(data.minTemp))
-        let maxTemp = Int(round(data.maxTemp))
-        
-        var nightImage = data.weather.icon
-        if !nightImage.isEmpty {
-            nightImage.removeLast()
-            nightImage.append("n")
-        }
-        print(nightImage)
-        cell.dayLabel.text = dayOfWeek(for: data.datetime)
-        cell.maxTemLabel.text = "\(maxTemp)°"
-        cell.minTemLabel.text = "\(minTemp)°"
-        cell.humidityLabel.text = "\(data.rh)%"
-        cell.weatherImage.image = UIImage(named: data.weather.icon)
-        cell.weatherNightImage.image = UIImage(named: nightImage)
+        let data = cellModel[indexPath.row]
+        cell.configure(viewModel: data)
         cell.backgroundColor = UIColor(named: "cloudColor")
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        60
+        return 60
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+}
+
+extension ViewController: MainDisplayLogic {
+    func displayWeeklyData(data: [MainModel.DaylyModel]) {
+        self.cellModel = data
+        tableView.reloadData()
+        
+        if let data = data.first {
+            DispatchQueue.main.async {
+                self.hightLowLabel.text = "H:\(data.maxTem))° L:\(data.minTem)°"
+            }
+        }
+    }
+    
+    func displayHourlyForecast(forecast: [MainModel.HourlyModel],
+                               currentForecast: MainModel.CurrentWeather) {
+        DispatchQueue.main.async {
+            self.cityTemperatureLabel.text = currentForecast.temp
+            self.cityFeelsLikeTemperatureLabel.text = currentForecast.appTemp
+            self.cityNameLabel.text = currentForecast.cityName
+            self.currentWeatherLabel.text = currentForecast.description
+        }
+        self.hourlyForecast = forecast
+        print("hourlyForecast \(hourlyForecast)")
+        collectionView.reloadData()
     }
 }

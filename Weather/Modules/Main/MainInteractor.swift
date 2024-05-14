@@ -17,6 +17,7 @@ class MainInteractor {
 }
 
 extension MainInteractor: MainBusinessLogic {
+    
     func fetchDataForWeek(for cityName: String) {
         ApiManager.shared.fetchWeeklyForecastData(for: cityName) { result in
             switch result {
@@ -40,6 +41,5 @@ extension MainInteractor: MainBusinessLogic {
             }
         }
     }
-    
     
 }
