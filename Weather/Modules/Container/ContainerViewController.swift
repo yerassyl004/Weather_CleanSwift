@@ -18,7 +18,7 @@ final class ContainerViewController: UIViewController {
     private var menuState: MenuState = .closed
     
     let menuVC = MenuViewController()
-    let homeVC = ViewController()
+    let homeVC = MainViewController()
     
     var navVC: UINavigationController?
     var centerController: UIViewController!

@@ -21,7 +21,7 @@ protocol MainDisplayLogic: AnyObject {
 let screenWidth = UIScreen.main.bounds.size.width
 let screenHeight = UIScreen.main.bounds.size.height
 
-final class ViewController: UIViewController {
+final class MainViewController: UIViewController {
     
     // MARK: - Deps
     var currentCityName = "London"
@@ -33,11 +33,20 @@ final class ViewController: UIViewController {
     var houryForecast: [DatumHourly] = []
     
     var interactor: MainBusinessLogic?
+    var router: (NSObjectProtocol & MainRoutingLogic & MainDataPassing)?
     private var cellModel = [MainModel.DaylyModel]()
     private var hourlyForecast = [MainModel.HourlyModel]()
     
     // MARK: - UI
-    let cityNameLabel: UILabel = {
+    private lazy var backgroundImage: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "cloud")
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+    
+    private lazy var cityNameLabel: UILabel = {
         let label = UILabel()
         label.text = "City"
         label.textAlignment = .center
@@ -45,7 +54,7 @@ final class ViewController: UIViewController {
         return label
     }()
     
-    let cityTemperatureLabel: UILabel = {
+    private lazy var cityTemperatureLabel: UILabel = {
         let label = UILabel()
         label.text = "20"
         label.textAlignment = .center
@@ -54,7 +63,7 @@ final class ViewController: UIViewController {
         return label
     }()
     
-    let cityFeelsLikeTemperatureLabel: UILabel = {
+    private lazy var cityFeelsLikeTemperatureLabel: UILabel = {
         let label = UILabel()
         label.text = "20"
         label.textAlignment = .center
@@ -63,7 +72,7 @@ final class ViewController: UIViewController {
         return label
     }()
     
-    let currentWeatherLabel: UILabel = {
+    private lazy var currentWeatherLabel: UILabel = {
         let label = UILabel()
         label.text = "Snow"
         label.textAlignment = .center
@@ -71,7 +80,7 @@ final class ViewController: UIViewController {
         return label
     }()
     
-    let hightLowLabel: UILabel = {
+    private lazy var hightLowLabel: UILabel = {
         let label = UILabel()
         label.text = "H:10 L:-5"
         label.textAlignment = .center
@@ -79,10 +88,15 @@ final class ViewController: UIViewController {
         return label
     }()
     
-    let scrollView: UIScrollView = {
+    private lazy var scrollView: UIScrollView = {
         let view = UIScrollView()
         view.isScrollEnabled = true
         view.alwaysBounceVertical = true
+        return view
+    }()
+    
+    private lazy var contentView: UIView = {
+        let view = UIView()
         return view
     }()
     
@@ -90,54 +104,20 @@ final class ViewController: UIViewController {
         let view = UIStackView()
         view.axis = .vertical
         view.spacing = 10
-        view.alignment = .center
+        view.alignment = .fill
         return view
     }()
     
-    private lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-        collectionView.contentInsetAdjustmentBehavior = .never
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.layer.cornerRadius = 15
-        collectionView.backgroundColor = UIColor(named: "cloudColor")
-        return collectionView
-    }()
+    private lazy var hourlyView = HourlyView()
     
-    let containerView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = 15
-        return view
-    }()
-    
-    let containerTableView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = 15
-        return view
-    }()
-    
-    private lazy var tableView: UITableView = {
-        let view = UITableView()
-        view.backgroundColor = UIColor(named: "cloudColor")
-        view.layer.cornerRadius = 15
-        view.isUserInteractionEnabled = false
-        view.register(TableViewCell.self, forCellReuseIdentifier: "cell")
-        view.isScrollEnabled = false
-        return view
-    }()
+    private lazy var weeklyView = WeeklyView()
     
     // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupNavigation()
         setupViews()
         setupConstraints()
-        setupArchitecture()
-        setupNavigation()
-        backgroundImage()
-        setupLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -152,177 +132,94 @@ final class ViewController: UIViewController {
         }
     }
     
-    private func setupArchitecture() {
-        let viewController = self
-        let interactor = MainInteractor()
-        let presenter = MainPresenter()
-        viewController.interactor = interactor
-        interactor.presenter = presenter
-        presenter.viewController = viewController
-        interactor.fetchDataForCity(for: currentCityName)
-    }
-    
     func setupNavigation() {
         let leftButton = UIBarButtonItem(image: UIImage(systemName: "list.dash"),
-                                     style: .done,
-                                     target: self,
-                                     action: #selector(didTapMenuButton))
+                                         style: .done,
+                                         target: self,
+                                         action: #selector(didTapMenuButton))
         navigationItem.leftBarButtonItem = leftButton
-        
     }
     
     // MARK: - SetupViews
     private func setupViews() {
+        MainConfigurator.shared.configure(viewController: self)
         view.backgroundColor = .systemBackground
-        
-        [cityNameLabel, cityTemperatureLabel, currentWeatherLabel, hightLowLabel, cityFeelsLikeTemperatureLabel, containerView, containerTableView].forEach {
-            stackView.addArrangedSubview($0)
+        view.addSubview(backgroundImage)
+        [cityNameLabel, cityTemperatureLabel, currentWeatherLabel, hightLowLabel, cityFeelsLikeTemperatureLabel, hourlyView, weeklyView].forEach {
+            contentView.addSubview($0)
         }
-        containerView.addSubview(collectionView)
-        containerTableView.addSubview(tableView)
         
-        scrollView.addSubview(stackView)
+        scrollView.addSubview(contentView)
         view.addSubview(scrollView)
-        
-        tableView.delegate = self
-        tableView.dataSource = self
     }
     
     @objc func didTapMenuButton() {
         delegate?.menuButtonDidTapped()
     }
     
-    func backgroundImage() {
-        let backgroundImage = UIImageView(image: UIImage(named: "cloud"))
-        backgroundImage.contentMode = .scaleAspectFill
-        backgroundImage.clipsToBounds = true
-        view.addSubview(backgroundImage)
-        view.sendSubviewToBack(backgroundImage)
+    func setupConstraints() {
+        scrollView.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
+        }
+        contentView.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.leading.equalTo(view.snp.leading).offset(16)
+            make.trailing.equalTo(view.snp.trailing).offset(-16)
+        }
         
         backgroundImage.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-    }
-    
-    func setupConstraints() {
-        
-        scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        stackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-            make.width.equalToSuperview()
-        }
 
         cityNameLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.height.equalTo(35)
+            make.centerX.equalToSuperview()
         }
         
         cityTemperatureLabel.snp.makeConstraints { make in
-            make.height.equalTo(80)
+            make.top.equalTo(cityNameLabel.snp.bottom)
+            make.centerX.equalToSuperview()
         }
+        
         currentWeatherLabel.snp.makeConstraints { make in
-            make.height.equalTo(20)
+            make.top.equalTo(cityTemperatureLabel.snp.bottom)
+            make.centerX.equalToSuperview()
         }
         
         hightLowLabel.snp.makeConstraints { make in
-            make.height.equalTo(20)
+            make.top.equalTo(currentWeatherLabel.snp.bottom)
+            make.centerX.equalToSuperview()
         }
         
         cityFeelsLikeTemperatureLabel.snp.makeConstraints { make in
-            make.height.equalTo(20)
+            make.top.equalTo(hightLowLabel.snp.bottom)
+            make.centerX.equalToSuperview()
         }
         
-        containerView.snp.makeConstraints { make in
+        hourlyView.snp.makeConstraints { make in
+            make.top.equalTo(cityFeelsLikeTemperatureLabel.snp.bottom).offset(16)
             make.height.equalTo(140)
-            make.width.equalTo(screenWidth - 20)
-            make.leading.equalToSuperview().offset(10)
-            make.trailing.equalToSuperview().offset(-10)
+            make.leading.trailing.equalToSuperview()
         }
         
-        collectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        weeklyView.snp.makeConstraints { make in
+            make.top.equalTo(hourlyView.snp.bottom).offset(16)
+            make.height.equalTo(600)
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
-        
-        containerView.backgroundColor = UIColor(named: "cloudColor")
-        containerTableView.backgroundColor = UIColor(named: "cloudColor")
-        
-        containerTableView.snp.makeConstraints { make in
-            make.height.equalTo(60 * 10)
-            make.width.equalTo(screenWidth - 20)
-            make.leading.equalToSuperview().offset(10)
-            make.trailing.equalToSuperview().offset(-10)
-        }
-        tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-    }
-    
-    func setupLayout() {
-        
-        let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout
-        layout?.scrollDirection = .horizontal
-        layout?.minimumLineSpacing = 0
-        layout?.minimumInteritemSpacing = 0
     }
 }
 
-extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return hourlyForecast.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? CollectionViewCell else {
-            return UICollectionViewCell()
-        }
-        let model = hourlyForecast[indexPath.row]
-        cell.configure(model: model)
-        cell.backgroundColor = UIColor(named: "cloudColor")
-        return cell
-    }
-    
-}
-
-// MARK: - Collection Delegate
-extension ViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let cellWidth: CGFloat = 60
-        let cellHeight: CGFloat = 140
-        return CGSize(width: cellWidth, height: cellHeight)
-    }
-    
-}
-
-// MARK: - TableView
-extension ViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return cellModel.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TableViewCell
-        let data = cellModel[indexPath.row]
-        cell.configure(viewModel: data)
-        cell.backgroundColor = UIColor(named: "cloudColor")
-        cell.selectionStyle = .none
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60
-    }
-}
-
-extension ViewController: MainDisplayLogic {
+extension MainViewController: MainDisplayLogic {
     func displayWeeklyData(data: [MainModel.DaylyModel]) {
         self.cellModel = data
-        tableView.reloadData()
+        weeklyView.setData(forecast: data)
         
         if let data = data.first {
             DispatchQueue.main.async {
-                self.hightLowLabel.text = "H:\(data.maxTem))° L:\(data.minTem)°"
+                self.hightLowLabel.text = "H:\(data.maxTem)° L:\(data.minTem)°"
             }
         }
     }
@@ -336,6 +233,6 @@ extension ViewController: MainDisplayLogic {
             self.currentWeatherLabel.text = currentForecast.description
         }
         self.hourlyForecast = forecast
-        collectionView.reloadData()
+        hourlyView.setData(forecast: forecast)
     }
 }

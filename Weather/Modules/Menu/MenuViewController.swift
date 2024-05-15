@@ -61,7 +61,7 @@ final class MenuViewController: UIViewController{
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    let homeVC = ViewController()
+    let homeVC = MainViewController()
     var navVC: UINavigationController?
     
     override func viewDidLoad() {
@@ -205,7 +205,7 @@ extension MenuViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let vc = ViewController()
+        let vc = MainViewController()
         let city = AddCity.addCity[indexPath.row].name
         print(vc.currentCityName)
         menuDelegate?.didSelectMenuItem(city: city)
