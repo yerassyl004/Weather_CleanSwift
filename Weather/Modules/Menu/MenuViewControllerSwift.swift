@@ -31,57 +31,45 @@ final class MenuViewController: UIViewController{
     weak var menuDelegate: MenuDelegate?
     weak var delegate: ManageDelegate?
     
-    let scrollView: UIScrollView = {
+    // MARK: - UI
+    private lazy var scrollView: UIScrollView = {
         let view = UIScrollView()
         view.isScrollEnabled = true
         view.alwaysBounceVertical = true
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    let stackView: UIStackView = {
+    private lazy var stackView: UIStackView = {
         let view = UIStackView()
         view.axis = .vertical
         view.spacing = 10
         view.alignment = .leading
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    private let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let view = UITableView()
         view.register(MenuTableViewCell.self, forCellReuseIdentifier: "cell")
         view.backgroundColor = .green
-        view.translatesAutoresizingMaskIntoConstraints = false
+        view.dataSource = self
+        view.delegate = self
         return view
     }()
     
-    private let manageButton: UIButton = {
+    private lazy var manageButton: UIButton = {
         let button = UIButton()
         button.setTitle("Manage", for: .normal)
         button.backgroundColor = .red
         button.layer.cornerRadius = 15
-        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(manageButtonTapped), for: .touchUpInside)
         return button
     }()
-    let homeVC = MainViewController()
-    var navVC: UINavigationController?
     
+    // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "cloudColor")
-        let vc = ManageViewController()
-        vc.delegateData = self
-        setupScroll()
-        updateTableViewHeight()
-    }
-    
-    func updateTableViewHeight() {
-        let newHeight = CGFloat(cities.count * 54)
-        heightConstraint.constant = newHeight
-        UIView.animate(withDuration: 0.3) {
-            self.view.layoutIfNeeded()
-        }
+        setupViews()
+        setupConstraints()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -93,60 +81,60 @@ final class MenuViewController: UIViewController{
         }
     }
     
-    func tableSetup() {
-        
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        tableView.layer.cornerRadius = 10
     }
     
-    func setupScroll() {
-        view.addSubview(scrollView)
-        
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
-        
-        scrollView.addSubview(stackView)
-        
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            stackView.leftAnchor.constraint(equalTo: scrollView.leftAnchor),
-            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            stackView.widthAnchor.constraint(equalToConstant: screenWidth),
-        ])
-        setupContainers()    }
-    
-    func setupContainers() {
+    // MARK: - Setup Views
+    private func setupViews() {
+        view.backgroundColor = UIColor(named: "cloudColor")
         stackView.addArrangedSubview(tableView)
         stackView.addArrangedSubview(manageButton)
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.layer.cornerRadius = 10
+        scrollView.addSubview(stackView)
+        view.addSubview(scrollView)
+        let vc = ManageViewController()
+        vc.delegateData = self
+    }
+    
+    // MARK: - Setup Constraints
+    private func setupConstraints() {
+        scrollView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         
+        stackView.snp.makeConstraints { make in
+            make.top.leading.bottom.equalToSuperview()
+            make.width.equalToSuperview()
+        }
         
-        NSLayoutConstraint.activate([
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 5),
-            tableView.widthAnchor.constraint(equalToConstant: menuWidth - 10),
-            
-        ])
+        tableView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(5)
+            make.width.equalTo(menuWidth - 10)
+        }
         
         heightConstraint = tableView.heightAnchor.constraint(equalToConstant: 0)
         heightConstraint.isActive = true
         
-        tableView.reloadData()
-        
-        NSLayoutConstraint.activate([
-            manageButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: (menuWidth - 100) / 2 ),
-            manageButton.heightAnchor.constraint(equalToConstant: 30),
-            manageButton.widthAnchor.constraint(equalToConstant: 100),
-        ])
-        manageButton.addTarget(self, action: #selector(manageButtonTapped), for: .touchUpInside)
+        manageButton.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset((menuWidth - 100) / 2)
+            make.height.equalTo(30)
+            make.width.equalTo(100)
+        }
     }
     
-    
+    // MARK: - Actions
     @objc func manageButtonTapped() {
         delegate?.didTapped()
+    }
+    
+    // MARK: - Functions
+    func updateTableViewHeight() {
+        let newHeight = CGFloat(cities.count * 54)
+        heightConstraint.constant = newHeight
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
     }
     
     func checkEnteredCity(for cityName: String) {
