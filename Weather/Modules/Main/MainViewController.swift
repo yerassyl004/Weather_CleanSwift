@@ -18,20 +18,11 @@ protocol MainDisplayLogic: AnyObject {
     func displayWeeklyData(data: [MainModel.DaylyModel])
 }
 
-let screenWidth = UIScreen.main.bounds.size.width
-let screenHeight = UIScreen.main.bounds.size.height
-
 final class MainViewController: UIViewController {
     
     // MARK: - Deps
-    var currentCityName = UserDefaultsManager.shared.getCurrentCity()
+    private var currentCityName = UserDefaultsManager.shared.getCurrentCity()
     weak var delegate: HomeViewControllerDelegate?
-    weak var manageVCDelegate: ManageViewControllerDelegate?
-    
-    var weeklyForecast: [DatumWeekly] = []
-    var weeklyForecastForTable: [DatumWeekly] = []
-    var houryForecast: [DatumHourly] = []
-    
     var interactor: MainBusinessLogic?
     var router: (NSObjectProtocol & MainRoutingLogic & MainDataPassing)?
     private var cellModel = [MainModel.DaylyModel]()
@@ -39,6 +30,18 @@ final class MainViewController: UIViewController {
     private var defaults = UserDefaultsManager.shared
     
     // MARK: - UI
+    private lazy var scrollView: UIScrollView = {
+        let view = UIScrollView()
+        view.isScrollEnabled = true
+        view.alwaysBounceVertical = true
+        return view
+    }()
+    
+    private lazy var contentView: UIView = {
+        let view = UIView()
+        return view
+    }()
+    
     private lazy var backgroundImage: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "cloud")
@@ -84,18 +87,6 @@ final class MainViewController: UIViewController {
         return label
     }()
     
-    private lazy var scrollView: UIScrollView = {
-        let view = UIScrollView()
-        view.isScrollEnabled = true
-        view.alwaysBounceVertical = true
-        return view
-    }()
-    
-    private lazy var contentView: UIView = {
-        let view = UIView()
-        return view
-    }()
-    
     private lazy var hourlyView = HourlyView()
     
     private lazy var weeklyView = WeeklyView()
@@ -121,6 +112,7 @@ final class MainViewController: UIViewController {
         }
     }
     
+    // MARK: - Setup Navigation
     func setupNavigation() {
         let leftButton = UIBarButtonItem(image: UIImage(systemName: "list.dash"),
                                          style: .done,
@@ -129,7 +121,7 @@ final class MainViewController: UIViewController {
         navigationItem.leftBarButtonItem = leftButton
     }
     
-    // MARK: - SetupViews
+    // MARK: - Setup Views
     private func setupViews() {
         MainConfigurator.shared.configure(viewController: self)
         view.backgroundColor = .systemBackground
@@ -142,6 +134,7 @@ final class MainViewController: UIViewController {
         view.addSubview(scrollView)
     }
     
+    // MARK: - Setup Constraints
     func setupConstraints() {
         scrollView.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview()

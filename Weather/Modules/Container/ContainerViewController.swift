@@ -32,13 +32,11 @@ final class ContainerViewController: UIViewController {
     }
     
     func addChildVC() {
-        
         addChild(menuVC)
         view.addSubview(menuVC.view)
         menuVC.didMove(toParent: self)
         menuVC.delegate = self
         menuVC.menuDelegate = self
-        homeVC.manageVCDelegate = menuVC
         
         let navVC = UINavigationController(rootViewController: homeVC)
         addChild(navVC)
@@ -72,6 +70,7 @@ extension ContainerViewController: HomeViewControllerDelegate {
                 }
             }
         }
+        menuVC.viewWillAppear(true)
     }
 }
 
@@ -86,7 +85,6 @@ extension ContainerViewController: ManageDelegate {
 
 extension ContainerViewController: MenuDelegate {
     func didSelectMenuItem(city: String) {
-        homeVC.currentCityName = city
         homeVC.viewWillAppear(true)
         menuState = .opened
         menuButtonDidTapped()

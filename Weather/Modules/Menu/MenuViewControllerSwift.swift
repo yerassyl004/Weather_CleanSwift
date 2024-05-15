@@ -25,8 +25,8 @@ final class MenuViewController: UIViewController{
     let manageVC = ManageViewController()
     var houryForecast: [DatumHourly] = []
     private var cities = [CityData]()
-    private var currentSelected: IndexPath?
-    private var previousSelected: IndexPath?
+    let screenWidth = UIScreen.main.bounds.size.width
+    let screenHeight = UIScreen.main.bounds.size.height
     
     weak var menuDelegate: MenuDelegate?
     weak var delegate: ManageDelegate?
@@ -177,6 +177,9 @@ extension MenuViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MenuTableViewCell
         let data = cities[indexPath.row]
+        if indexPath.row == 0 {
+            cities[indexPath.row].currentCity = true
+        }
         cell.configure(model: data)
         return cell
     }
