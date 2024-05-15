@@ -51,6 +51,8 @@ final class MenuViewController: UIViewController{
         let view = UITableView()
         view.register(MenuTableViewCell.self, forCellReuseIdentifier: "cell")
         view.backgroundColor = .green
+        view.dataSource = self
+        view.delegate = self
         return view
     }()
     
@@ -65,10 +67,8 @@ final class MenuViewController: UIViewController{
     // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "cloudColor")
-        let vc = ManageViewController()
-        vc.delegateData = self
         setupViews()
+        setupConstraints()
         updateTableViewHeight()
     }
     
@@ -81,37 +81,34 @@ final class MenuViewController: UIViewController{
         }
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        tableView.layer.cornerRadius = 10
+    }
+    
     func tableSetup() {
         
     }
     
     func setupViews() {
-        view.addSubview(scrollView)
-        
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
-        
-        scrollView.addSubview(stackView)
-        
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            stackView.leftAnchor.constraint(equalTo: scrollView.leftAnchor),
-            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            stackView.widthAnchor.constraint(equalToConstant: screenWidth),
-        ])
-        setupContainers()    }
-    
-    func setupContainers() {
+        view.backgroundColor = UIColor(named: "cloudColor")
         stackView.addArrangedSubview(tableView)
         stackView.addArrangedSubview(manageButton)
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.layer.cornerRadius = 10
+        scrollView.addSubview(stackView)
+        view.addSubview(scrollView)
+        let vc = ManageViewController()
+        vc.delegateData = self
+    }
+    
+    func setupConstraints() {
+        scrollView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         
+        stackView.snp.makeConstraints { make in
+            make.top.leading.bottom.equalToSuperview()
+            make.width.equalToSuperview()
+        }
         
         NSLayoutConstraint.activate([
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 5),
