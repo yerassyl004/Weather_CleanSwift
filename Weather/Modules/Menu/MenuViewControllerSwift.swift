@@ -25,8 +25,8 @@ final class MenuViewController: UIViewController{
     let manageVC = ManageViewController()
     var houryForecast: [DatumHourly] = []
     private var cities = [CityData]()
-    private var currentSelected: IndexPath?
-    private var previousSelected: IndexPath?
+    let screenWidth = UIScreen.main.bounds.size.width
+    let screenHeight = UIScreen.main.bounds.size.height
     
     weak var menuDelegate: MenuDelegate?
     weak var delegate: ManageDelegate?
