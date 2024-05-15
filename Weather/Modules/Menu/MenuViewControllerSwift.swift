@@ -61,6 +61,7 @@ final class MenuViewController: UIViewController{
         button.setTitle("Manage", for: .normal)
         button.backgroundColor = .red
         button.layer.cornerRadius = 15
+        button.addTarget(self, action: #selector(manageButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -69,7 +70,6 @@ final class MenuViewController: UIViewController{
         super.viewDidLoad()
         setupViews()
         setupConstraints()
-        updateTableViewHeight()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -86,11 +86,8 @@ final class MenuViewController: UIViewController{
         tableView.layer.cornerRadius = 10
     }
     
-    func tableSetup() {
-        
-    }
-    
-    func setupViews() {
+    // MARK: - Setup Views
+    private func setupViews() {
         view.backgroundColor = UIColor(named: "cloudColor")
         stackView.addArrangedSubview(tableView)
         stackView.addArrangedSubview(manageButton)
@@ -100,7 +97,8 @@ final class MenuViewController: UIViewController{
         vc.delegateData = self
     }
     
-    func setupConstraints() {
+    // MARK: - Setup Constraints
+    private func setupConstraints() {
         scrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -110,23 +108,19 @@ final class MenuViewController: UIViewController{
             make.width.equalToSuperview()
         }
         
-        NSLayoutConstraint.activate([
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 5),
-            tableView.widthAnchor.constraint(equalToConstant: menuWidth - 10),
-            
-        ])
+        tableView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(5)
+            make.width.equalTo(menuWidth - 10)
+        }
         
         heightConstraint = tableView.heightAnchor.constraint(equalToConstant: 0)
         heightConstraint.isActive = true
         
-        tableView.reloadData()
-        
-        NSLayoutConstraint.activate([
-            manageButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: (menuWidth - 100) / 2 ),
-            manageButton.heightAnchor.constraint(equalToConstant: 30),
-            manageButton.widthAnchor.constraint(equalToConstant: 100),
-        ])
-        manageButton.addTarget(self, action: #selector(manageButtonTapped), for: .touchUpInside)
+        manageButton.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset((menuWidth - 100) / 2)
+            make.height.equalTo(30)
+            make.width.equalTo(100)
+        }
     }
     
     // MARK: - Actions
