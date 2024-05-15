@@ -11,22 +11,5 @@ struct CityData: Codable {
     let name: String
     let temperature: Int
     let icon: String
-    let currentCity: Bool
+    var currentCity: Bool? = false
 }
-
-var cities: [CityData] = []
-
-struct AddCity {
-    static var addCity: [CityData] = {
-        [
-            .init(name: "Chicago", temperature: 10, icon: "c01n", currentCity: true),
-            .init(name: "London", temperature: 10, icon: "c01d", currentCity: false)
-        ]
-    }()
-    
-    static func cityData() -> [CityData] {
-        return addCity
-    }
-    
-}
-

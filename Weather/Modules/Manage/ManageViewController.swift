@@ -6,50 +6,50 @@
 //
 
 import UIKit
+import SnapKit
 
 protocol ManageViewControllerDelegate: AnyObject {
     func didUpdateCities()
 }
 
+protocol ManageDisplayLogic: AnyObject {
+    func displayCityData(data: [CityData])
+}
+
 final class ManageViewController: UIViewController {
     
     // MARK: - Deps
+    var interactor: ManageBusinessLogic?
+    var router: (ManageDataPassing & ManageRoutingLogic)?
     private let defaults = UserDefaultsManager.shared
     weak var delegateData: ManageViewControllerDelegate?
-    var houryForecast: [DatumHourly] = []
-    var height = AddCity.addCity.count
     private var cities = [CityData]()
+    private var height = 0
     
-    private var heightConstraint: NSLayoutConstraint!
-    
-    private let tableView: UITableView = {
-        let view = UITableView()
-        view.register(MenuTableViewCell.self, forCellReuseIdentifier: "cell")
-        view.backgroundColor = .green
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    let scrollView: UIScrollView = {
+    // MARK: - UI
+    private lazy var scrollView: UIScrollView = {
         let view = UIScrollView()
         view.isScrollEnabled = true
         view.alwaysBounceVertical = true
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    let stackView: UIStackView = {
-        let view = UIStackView()
-        view.axis = .vertical
-        view.spacing = 10
-        view.alignment = .center
-        view.translatesAutoresizingMaskIntoConstraints = false
+    private lazy var contentView: UIView = {
+        let view = UIView()
         return view
     }()
     
-    let backButton: UIButton = {
+    private lazy var tableView: UITableView = {
+        let view = UITableView()
+        view.register(MenuTableViewCell.self, forCellReuseIdentifier: "cell")
+        view.dataSource = self
+        view.delegate = self
+        return view
+    }()
+    
+    private lazy var backButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -58,82 +58,51 @@ final class ManageViewController: UIViewController {
         button.setTitle("Add", for: .normal)
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 15
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        setupScroll()
-        updateTableViewHeight()
+        setupNavigation()
+        setupViews()
+        setupConstraints()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if let cityData = defaults.getCityData() {
-            cities = cityData
-            updateTableViewHeight()
-            tableView.reloadData()
+        interactor?.getCitiData()
+    }
+    
+    private func setupNavigation() {
+        navigationItem.title = "Manage locatoins"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "chevron.backward"),
+            style: .done,
+            target: self,
+            action: #selector(backButtonTapped))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"),
+                                                            style: .done,
+                                                            target: self,
+                                                            action: #selector(addButtonTapped))
+    }
+    
+    func setupViews() {
+        ManageConfigurator.shared.configure(viewController: self)
+        view.backgroundColor = .systemBackground
+        view.addSubview(tableView)
+    }
+    
+    func setupConstraints() {
+        tableView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview()
         }
     }
     
+    // MARK: - Actions
     @objc func backButtonTapped() {
-        dismiss(animated: true)
-    }
-    
-    func setupScroll() {
-        view.addSubview(scrollView)
-        
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
-        
-        scrollView.addSubview(stackView)
-        
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            stackView.leftAnchor.constraint(equalTo: scrollView.leftAnchor),
-            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            stackView.widthAnchor.constraint(equalToConstant: screenWidth)
-        ])
-        setupContainers()    }
-    
-    func setupContainers() {
-        
-        stackView.addArrangedSubview(backButton)
-        NSLayoutConstraint.activate([
-            backButton.heightAnchor.constraint(equalToConstant: 40),
-            backButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10)
-        ])
-        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
-        
-        stackView.addArrangedSubview(tableView)
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.layer.cornerRadius = 15
-        
-        
-        NSLayoutConstraint.activate([
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
-            tableView.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 20)
-        ])
-        
-        heightConstraint = tableView.heightAnchor.constraint(equalToConstant: 0)
-        heightConstraint.isActive = true
-        
-        stackView.addArrangedSubview(addButton)
-        NSLayoutConstraint.activate([
-            addButton.heightAnchor.constraint(equalToConstant: 35),
-            addButton.widthAnchor.constraint(equalToConstant: 100),
-        ])
-        addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
-        
-        tableView.reloadData()
+        navigationController?.popViewController(animated: true)
     }
     
     func showTextFieldAlert() {
@@ -157,10 +126,8 @@ final class ManageViewController: UIViewController {
                 if let enteredText = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !enteredText.isEmpty {
                     
                     print("Entered text: \(enteredText)")
-                    
                     DispatchQueue.main.async {
-                        self.checkEnteredCity(for: enteredText)
-                        self.height = AddCity.addCity.count
+                        self.interactor?.addNewCity(cityName: enteredText)
                         errorLabel.isHidden = true
                     }
                 } else {
@@ -174,26 +141,6 @@ final class ManageViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    func checkEnteredCity(for cityName: String) {
-        ApiManager.shared.fetchHourlyForecast(cityName: cityName) { result in
-            switch result {
-            case .success(let hourlyForecast):
-                DispatchQueue.main.async {
-                    self.houryForecast = hourlyForecast.data
-                    let name = hourlyForecast.cityName
-                    if let data = self.houryForecast.first {
-                        self.cities.append(.init(name: name, temperature: Int(data.temp), icon: data.weather.icon, currentCity: false))
-                        self.defaults.saveCityData(data: self.cities)
-                        self.updateTableViewHeight()
-                        self.tableView.reloadData()
-                    }
-                }
-            case .failure(let error):
-                print("Error fetching hourly forecast: \(error)")
-            }
-        }
-    }
-    
     @objc func addButtonTapped() {
         showTextFieldAlert()
         delegateData?.didUpdateCities()
@@ -202,7 +149,6 @@ final class ManageViewController: UIViewController {
     func updateTableViewHeight() {
         height = cities.count
         let newHeight = CGFloat(height * 54)
-        heightConstraint.constant = newHeight
 
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
@@ -244,6 +190,7 @@ extension ManageViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MenuTableViewCell
         let data = cities[indexPath.row]
+        print(data)
         cell.configure(model: data)
         return cell
     }
@@ -255,11 +202,18 @@ extension ManageViewController: UITableViewDelegate, UITableViewDataSource {
         cities.remove(at: indexPath.row)
         tableView.deleteRows(at: [indexPath], with: .left)
         defaults.saveCityData(data: cities)
-        updateTableViewHeight()
     }
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         let city = cities.remove(at: sourceIndexPath.row)
         cities.insert(city, at: destinationIndexPath.row)
         defaults.saveCityData(data: cities)
+    }
+}
+
+extension ManageViewController: ManageDisplayLogic {
+    func displayCityData(data: [CityData]) {
+        cities = data
+        print(cities)
+        tableView.reloadData()
     }
 }

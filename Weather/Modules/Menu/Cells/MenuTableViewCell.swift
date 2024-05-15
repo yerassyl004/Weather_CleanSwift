@@ -51,7 +51,7 @@ final class MenuTableViewCell: UITableViewCell {
     }
     
     private func setupViews() {
-        contentView.backgroundColor = .systemYellow
+        contentView.backgroundColor = .systemBackground
         contentView.addSubview(nameLabel)
         contentView.addSubview(temperatureLabel)
         contentView.addSubview(iconImage)
@@ -83,14 +83,15 @@ final class MenuTableViewCell: UITableViewCell {
     }
     
     public func configure(model: CityData) {
-        if model.currentCity {
+        let isSelected = model.currentCity ?? false
+        if isSelected {
             currentImage.image = UIImage(systemName: "mappin.and.ellipse")
         } else {
             currentImage.image = nil
         }
         nameLabel.text = model.name
         iconImage.image = UIImage(named: model.icon)
-        temperatureLabel.text = String(model.temperature)
+        temperatureLabel.text = "\(model.temperature)º"
     }
 
 }

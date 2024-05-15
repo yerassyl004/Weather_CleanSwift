@@ -46,7 +46,6 @@ final class ContainerViewController: UIViewController {
         navVC.didMove(toParent: self)
         homeVC.delegate = self
         self.navVC = navVC
-        
     }
 
 }
