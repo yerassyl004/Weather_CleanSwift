@@ -32,6 +32,11 @@
 		0E44A7D92BF45C1900815DA0 /* HourlyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E44A7D82BF45C1900815DA0 /* HourlyView.swift */; };
 		0E44A7DB2BF45F5300815DA0 /* WeeklyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E44A7DA2BF45F5300815DA0 /* WeeklyView.swift */; };
 		0E44A7DD2BF465AB00815DA0 /* MainConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E44A7DC2BF465AB00815DA0 /* MainConfigurator.swift */; };
+		0E44A7E02BF469DF00815DA0 /* AppFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E44A7DF2BF469DF00815DA0 /* AppFonts.swift */; };
+		0E44A7E22BF469E500815DA0 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E44A7E12BF469E500815DA0 /* AppColors.swift */; };
+		0E44A7E42BF469F000815DA0 /* AppImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E44A7E32BF469F000815DA0 /* AppImages.swift */; };
+		0E44A7EB2BF46A9A00815DA0 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E44A7EA2BF46A9A00815DA0 /* UserDefaultsManager.swift */; };
+		0E44A7ED2BF46CF300815DA0 /* AppKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E44A7EC2BF46CF300815DA0 /* AppKeys.swift */; };
 		0E7108B82BF3B6040045C64E /* WeatherAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7108B72BF3B6040045C64E /* WeatherAPI.swift */; };
 		0E7108BA2BF3B6EF0045C64E /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 0E7108B92BF3B6EF0045C64E /* CombineMoya */; };
 		0E7108BC2BF3B6EF0045C64E /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 0E7108BB2BF3B6EF0045C64E /* Moya */; };
@@ -107,6 +112,15 @@
 		0E44A7D82BF45C1900815DA0 /* HourlyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyView.swift; sourceTree = "<group>"; };
 		0E44A7DA2BF45F5300815DA0 /* WeeklyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyView.swift; sourceTree = "<group>"; };
 		0E44A7DC2BF465AB00815DA0 /* MainConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainConfigurator.swift; sourceTree = "<group>"; };
+		0E44A7DF2BF469DF00815DA0 /* AppFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFonts.swift; sourceTree = "<group>"; };
+		0E44A7E12BF469E500815DA0 /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
+		0E44A7E32BF469F000815DA0 /* AppImages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImages.swift; sourceTree = "<group>"; };
+		0E44A7E62BF46A1B00815DA0 /* SFProDisplay-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProDisplay-Bold.ttf"; sourceTree = "<group>"; };
+		0E44A7E72BF46A1B00815DA0 /* SFProDisplay-Semibold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProDisplay-Semibold.ttf"; sourceTree = "<group>"; };
+		0E44A7E82BF46A1B00815DA0 /* SFProDisplay-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProDisplay-Medium.ttf"; sourceTree = "<group>"; };
+		0E44A7E92BF46A1B00815DA0 /* SFProDisplay-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProDisplay-Regular.ttf"; sourceTree = "<group>"; };
+		0E44A7EA2BF46A9A00815DA0 /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
+		0E44A7EC2BF46CF300815DA0 /* AppKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppKeys.swift; sourceTree = "<group>"; };
 		0E7108B72BF3B6040045C64E /* WeatherAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAPI.swift; sourceTree = "<group>"; };
 		0E7108C12BF3B9B60045C64E /* MainModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainModel.swift; sourceTree = "<group>"; };
 		0EAFE1FC2B517CD20023C889 /* WeatherWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WeatherWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -193,6 +207,7 @@
 				0E0C56122B4BF6BF008DCFD6 /* Info.plist */,
 				0E0C56042B4BF6BD008DCFD6 /* AppDelegate.swift */,
 				0E0C56062B4BF6BD008DCFD6 /* SceneDelegate.swift */,
+				0E0C560F2B4BF6BF008DCFD6 /* LaunchScreen.storyboard */,
 				0E7FFB8B2BB272A400B811F9 /* Helpers */,
 				0E7FFB8A2BB2729B00B811F9 /* Resources */,
 				0EBED6E62BC2739900CB5F56 /* WeatherManager */,
@@ -211,6 +226,36 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		0E44A7DE2BF469C700815DA0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0E44A7E52BF46A0700815DA0 /* Fonts */,
+				0E44A7DF2BF469DF00815DA0 /* AppFonts.swift */,
+				0E44A7E12BF469E500815DA0 /* AppColors.swift */,
+				0E44A7E32BF469F000815DA0 /* AppImages.swift */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		0E44A7E52BF46A0700815DA0 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				0E44A7E62BF46A1B00815DA0 /* SFProDisplay-Bold.ttf */,
+				0E44A7E82BF46A1B00815DA0 /* SFProDisplay-Medium.ttf */,
+				0E44A7E92BF46A1B00815DA0 /* SFProDisplay-Regular.ttf */,
+				0E44A7E72BF46A1B00815DA0 /* SFProDisplay-Semibold.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		0E44A7EE2BF4721700815DA0 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				0E1E18232B4E9142009A8C7D /* MenuTableViewCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
 		0E7FFB882BB2723300B811F9 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
@@ -225,7 +270,6 @@
 		0E7FFB892BB2727D00B811F9 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				0E0C560F2B4BF6BF008DCFD6 /* LaunchScreen.storyboard */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -234,6 +278,8 @@
 			isa = PBXGroup;
 			children = (
 				0E0C560D2B4BF6BF008DCFD6 /* Assets.xcassets */,
+				0E44A7EA2BF46A9A00815DA0 /* UserDefaultsManager.swift */,
+				0E44A7EC2BF46CF300815DA0 /* AppKeys.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -241,6 +287,7 @@
 		0E7FFB8B2BB272A400B811F9 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				0E44A7DE2BF469C700815DA0 /* Resources */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -284,6 +331,7 @@
 		0E7FFB8F2BB273ED00B811F9 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
+				0E44A7EE2BF4721700815DA0 /* Cells */,
 				0EF73A782B4D794900378791 /* MenuViewController.swift */,
 				0E7FFB912BB2742E00B811F9 /* Models */,
 			);
@@ -293,6 +341,7 @@
 		0E7FFB912BB2742E00B811F9 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				0E1E18212B4E8ED9009A8C7D /* CityData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -310,7 +359,6 @@
 		0E7FFB932BB274AE00B811F9 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				0E1E18232B4E9142009A8C7D /* MenuTableViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -318,7 +366,6 @@
 		0E7FFB942BB274B500B811F9 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				0E1E18212B4E8ED9009A8C7D /* CityData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -525,17 +572,22 @@
 				0EF73A772B4D771000378791 /* ContainerViewController.swift in Sources */,
 				0E0C561B2B4BF761008DCFD6 /* ApiManager.swift in Sources */,
 				0E1E18262B4FC707009A8C7D /* ManageViewController.swift in Sources */,
+				0E44A7ED2BF46CF300815DA0 /* AppKeys.swift in Sources */,
 				0E7108C22BF3B9B60045C64E /* MainModel.swift in Sources */,
 				0EF73A792B4D794900378791 /* MenuViewController.swift in Sources */,
 				0E44A7DD2BF465AB00815DA0 /* MainConfigurator.swift in Sources */,
+				0E44A7E02BF469DF00815DA0 /* AppFonts.swift in Sources */,
+				0E44A7E22BF469E500815DA0 /* AppColors.swift in Sources */,
 				0E0C56212B4C01A9008DCFD6 /* ApiModelWeekly.swift in Sources */,
 				0E4181BF2BC3C18400008629 /* MainInteractor.swift in Sources */,
 				0E0C561F2B4BFD68008DCFD6 /* CollectionViewCell.swift in Sources */,
 				0E0C561D2B4BFD28008DCFD6 /* TableViewCell.swift in Sources */,
 				0E4181C12BC3C18E00008629 /* MainPresenter.swift in Sources */,
+				0E44A7E42BF469F000815DA0 /* AppImages.swift in Sources */,
 				0E1E18242B4E9142009A8C7D /* MenuTableViewCell.swift in Sources */,
 				0E0C56052B4BF6BD008DCFD6 /* AppDelegate.swift in Sources */,
 				0EF73A722B4D31DC00378791 /* ApiModelHourly.swift in Sources */,
+				0E44A7EB2BF46A9A00815DA0 /* UserDefaultsManager.swift in Sources */,
 				0E44A7D92BF45C1900815DA0 /* HourlyView.swift in Sources */,
 				0E0C56072B4BF6BD008DCFD6 /* SceneDelegate.swift in Sources */,
 				0E4181C52BC3C27000008629 /* MainRouter.swift in Sources */,

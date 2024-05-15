@@ -13,9 +13,12 @@ protocol ManageViewControllerDelegate: AnyObject {
 
 final class ManageViewController: UIViewController {
     
+    // MARK: - Deps
+    private let defaults = UserDefaultsManager.shared
     weak var delegateData: ManageViewControllerDelegate?
     var houryForecast: [DatumHourly] = []
     var height = AddCity.addCity.count
+    private var cities = [CityData]()
     
     private var heightConstraint: NSLayoutConstraint!
     
@@ -62,15 +65,17 @@ final class ManageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        // Do any additional setup after loading the view.
-//        let rightButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), style: .plain, target: self, action: #selector(editButtonTapped))
-//        navigationItem.rightBarButtonItem = rightButton
-//        
-//        let leftButton = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: .plain, target: self, action: #selector(backButtonTapped))
-//        navigationItem.leftBarButtonItem = leftButton
-        
         setupScroll()
         updateTableViewHeight()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let cityData = defaults.getCityData() {
+            cities = cityData
+            updateTableViewHeight()
+            tableView.reloadData()
+        }
     }
     
     @objc func backButtonTapped() {
@@ -177,7 +182,8 @@ final class ManageViewController: UIViewController {
                     self.houryForecast = hourlyForecast.data
                     let name = hourlyForecast.cityName
                     if let data = self.houryForecast.first {
-                        AddCity.addCity.append(.init(name: name, temperature: Int(data.temp), icon: data.weather.icon, currentCity: false))
+                        self.cities.append(.init(name: name, temperature: Int(data.temp), icon: data.weather.icon, currentCity: false))
+                        self.defaults.saveCityData(data: self.cities)
                         self.updateTableViewHeight()
                         self.tableView.reloadData()
                     }
@@ -194,13 +200,14 @@ final class ManageViewController: UIViewController {
     }
     
     func updateTableViewHeight() {
-        height = AddCity.addCity.count
-        let newHeight = CGFloat(height * 50)
+        height = cities.count
+        let newHeight = CGFloat(height * 54)
         heightConstraint.constant = newHeight
 
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }
+        tableView.reloadData()
     }
     
     @objc func editButtonTapped() {
@@ -223,8 +230,6 @@ final class ManageViewController: UIViewController {
             errorLabel.trailingAnchor.constraint(equalTo: alert.view.trailingAnchor, constant: -padding),
             errorLabel.heightAnchor.constraint(equalToConstant: height)
         ])
-
-        // Optional: Dismiss the alert after a delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             alert.dismiss(animated: true, completion: nil)
         }
@@ -233,38 +238,28 @@ final class ManageViewController: UIViewController {
 
 extension ManageViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        height
+        return cities.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MenuTableViewCell
-        let data = AddCity.addCity[indexPath.row]
-        
-        if data.currentCity {
-            cell.currentImage.image = UIImage(systemName: "mappin.and.ellipse")
-        }
-        else {
-            cell.currentImage.image = UIImage(named: "")
-        }
-        cell.nameLabel.text = data.name
-        cell.iconImage.image = UIImage(named: data.icon)
-        cell.temperatureLabel.text = "\(data.temperature)°"
-        cell.backgroundColor = .systemYellow
+        let data = cities[indexPath.row]
+        cell.configure(model: data)
         return cell
-    }
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        50
     }
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath:
                    IndexPath) {
-        AddCity.addCity.remove(at: indexPath.row)
+        cities.remove(at: indexPath.row)
         tableView.deleteRows(at: [indexPath], with: .left)
+        defaults.saveCityData(data: cities)
+        updateTableViewHeight()
     }
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let city = AddCity.addCity.remove(at: sourceIndexPath.row)
-        AddCity.addCity.insert(city, at: destinationIndexPath.row)
+        let city = cities.remove(at: sourceIndexPath.row)
+        cities.insert(city, at: destinationIndexPath.row)
+        defaults.saveCityData(data: cities)
     }
 }

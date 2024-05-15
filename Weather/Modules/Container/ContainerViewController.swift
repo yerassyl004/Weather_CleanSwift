@@ -18,7 +18,7 @@ final class ContainerViewController: UIViewController {
     private var menuState: MenuState = .closed
     
     let menuVC = MenuViewController()
-    let homeVC = MainViewController()
+    var homeVC = MainViewController()
     
     var navVC: UINavigationController?
     var centerController: UIViewController!
@@ -53,11 +53,10 @@ final class ContainerViewController: UIViewController {
 
 extension ContainerViewController: HomeViewControllerDelegate {
     func menuButtonDidTapped() {
-        
         switch menuState {
         case .closed:
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0,options: .curveEaseOut) {
-                self.navVC?.view.frame.origin.x = (self.navVC?.view.frame.size.width)! - 100
+                self.navVC?.view.frame.origin.x = (self.navVC?.view.frame.size.width)! - 80
                 self.menuVC.view.frame.origin.x = 0
             } completion: { done in
                 if done {
@@ -79,7 +78,10 @@ extension ContainerViewController: HomeViewControllerDelegate {
 
 extension ContainerViewController: ManageDelegate {
     func didTapped() {
-        print("Did tapped")
+        let vc = ManageViewController()
+        menuState = .opened
+        homeVC.navigationController?.pushViewController(vc, animated: false)
+        menuButtonDidTapped()
     }
 }
 
@@ -87,7 +89,6 @@ extension ContainerViewController: MenuDelegate {
     func didSelectMenuItem(city: String) {
         homeVC.currentCityName = city
         homeVC.viewWillAppear(true)
-        print("Tapped Menu")
         menuState = .opened
         menuButtonDidTapped()
     }

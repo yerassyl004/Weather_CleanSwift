@@ -24,7 +24,7 @@ let screenHeight = UIScreen.main.bounds.size.height
 final class MainViewController: UIViewController {
     
     // MARK: - Deps
-    var currentCityName = "London"
+    var currentCityName = UserDefaultsManager.shared.getCurrentCity()
     weak var delegate: HomeViewControllerDelegate?
     weak var manageVCDelegate: ManageViewControllerDelegate?
     
@@ -36,6 +36,7 @@ final class MainViewController: UIViewController {
     var router: (NSObjectProtocol & MainRoutingLogic & MainDataPassing)?
     private var cellModel = [MainModel.DaylyModel]()
     private var hourlyForecast = [MainModel.HourlyModel]()
+    private var defaults = UserDefaultsManager.shared
     
     // MARK: - UI
     private lazy var backgroundImage: UIImageView = {
@@ -48,7 +49,6 @@ final class MainViewController: UIViewController {
     
     private lazy var cityNameLabel: UILabel = {
         let label = UILabel()
-        label.text = "City"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 30)
         return label
@@ -56,7 +56,6 @@ final class MainViewController: UIViewController {
     
     private lazy var cityTemperatureLabel: UILabel = {
         let label = UILabel()
-        label.text = "20"
         label.textAlignment = .center
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 90, weight: .thin)
@@ -65,7 +64,6 @@ final class MainViewController: UIViewController {
     
     private lazy var cityFeelsLikeTemperatureLabel: UILabel = {
         let label = UILabel()
-        label.text = "20"
         label.textAlignment = .center
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 20)
@@ -74,7 +72,6 @@ final class MainViewController: UIViewController {
     
     private lazy var currentWeatherLabel: UILabel = {
         let label = UILabel()
-        label.text = "Snow"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 20)
         return label
@@ -82,7 +79,6 @@ final class MainViewController: UIViewController {
     
     private lazy var hightLowLabel: UILabel = {
         let label = UILabel()
-        label.text = "H:10 L:-5"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 20)
         return label
@@ -100,14 +96,6 @@ final class MainViewController: UIViewController {
         return view
     }()
     
-    let stackView: UIStackView = {
-        let view = UIStackView()
-        view.axis = .vertical
-        view.spacing = 10
-        view.alignment = .fill
-        return view
-    }()
-    
     private lazy var hourlyView = HourlyView()
     
     private lazy var weeklyView = WeeklyView()
@@ -122,13 +110,14 @@ final class MainViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let queue = DispatchQueue(label: "fetchData", attributes: .concurrent)
-        let qu = DispatchQueue.global()
-        qu.async {
-            self.interactor?.fetchDataForWeek(for: self.currentCityName)
-        }
-        queue.async {
-            self.interactor?.fetchDataForCity(for: self.currentCityName)
+        if let currentCityName {
+            let qu = DispatchQueue.global()
+            qu.async {
+                self.interactor?.fetchDataForWeek(for: currentCityName)
+            }
+            qu.async {
+                self.interactor?.fetchDataForCity(for: currentCityName)
+            }
         }
     }
     
@@ -151,10 +140,6 @@ final class MainViewController: UIViewController {
         
         scrollView.addSubview(contentView)
         view.addSubview(scrollView)
-    }
-    
-    @objc func didTapMenuButton() {
-        delegate?.menuButtonDidTapped()
     }
     
     func setupConstraints() {
@@ -210,8 +195,14 @@ final class MainViewController: UIViewController {
             make.bottom.equalToSuperview()
         }
     }
+    
+    // MARK: - Actions
+    @objc func didTapMenuButton() {
+        delegate?.menuButtonDidTapped()
+    }
 }
 
+// MARK: - Display Logic
 extension MainViewController: MainDisplayLogic {
     func displayWeeklyData(data: [MainModel.DaylyModel]) {
         self.cellModel = data
