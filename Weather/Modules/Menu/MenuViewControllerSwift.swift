@@ -177,6 +177,9 @@ extension MenuViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MenuTableViewCell
         let data = cities[indexPath.row]
+        if indexPath.row == 0 {
+            cities[indexPath.row].currentCity = true
+        }
         cell.configure(model: data)
         return cell
     }

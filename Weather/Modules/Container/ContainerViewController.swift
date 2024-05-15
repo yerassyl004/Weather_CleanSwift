@@ -32,7 +32,6 @@ final class ContainerViewController: UIViewController {
     }
     
     func addChildVC() {
-        
         addChild(menuVC)
         view.addSubview(menuVC.view)
         menuVC.didMove(toParent: self)
@@ -72,6 +71,7 @@ extension ContainerViewController: HomeViewControllerDelegate {
                 }
             }
         }
+        menuVC.viewWillAppear(true)
     }
 }
 
