@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CityData {
+struct CityData: Codable {
     let name: String
     let temperature: Int
     let icon: String

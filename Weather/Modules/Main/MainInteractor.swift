@@ -12,7 +12,11 @@ protocol MainBusinessLogic {
     func fetchDataForWeek(for cityName: String)
 }
 
-class MainInteractor {
+protocol MainDataStore {
+    
+}
+
+class MainInteractor: MainDataStore {
     var presenter: MainPresentationLogic?
 }
 
