@@ -31,57 +31,45 @@ final class MenuViewController: UIViewController{
     weak var menuDelegate: MenuDelegate?
     weak var delegate: ManageDelegate?
     
-    let scrollView: UIScrollView = {
+    // MARK: - UI
+    private lazy var scrollView: UIScrollView = {
         let view = UIScrollView()
         view.isScrollEnabled = true
         view.alwaysBounceVertical = true
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    let stackView: UIStackView = {
+    private lazy var stackView: UIStackView = {
         let view = UIStackView()
         view.axis = .vertical
         view.spacing = 10
         view.alignment = .leading
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    private let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let view = UITableView()
         view.register(MenuTableViewCell.self, forCellReuseIdentifier: "cell")
         view.backgroundColor = .green
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    private let manageButton: UIButton = {
+    private lazy var manageButton: UIButton = {
         let button = UIButton()
         button.setTitle("Manage", for: .normal)
         button.backgroundColor = .red
         button.layer.cornerRadius = 15
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    let homeVC = MainViewController()
-    var navVC: UINavigationController?
     
+    // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "cloudColor")
         let vc = ManageViewController()
         vc.delegateData = self
-        setupScroll()
+        setupViews()
         updateTableViewHeight()
-    }
-    
-    func updateTableViewHeight() {
-        let newHeight = CGFloat(cities.count * 54)
-        heightConstraint.constant = newHeight
-        UIView.animate(withDuration: 0.3) {
-            self.view.layoutIfNeeded()
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -97,7 +85,7 @@ final class MenuViewController: UIViewController{
         
     }
     
-    func setupScroll() {
+    func setupViews() {
         view.addSubview(scrollView)
         
         NSLayoutConstraint.activate([
@@ -144,9 +132,18 @@ final class MenuViewController: UIViewController{
         manageButton.addTarget(self, action: #selector(manageButtonTapped), for: .touchUpInside)
     }
     
-    
+    // MARK: - Actions
     @objc func manageButtonTapped() {
         delegate?.didTapped()
+    }
+    
+    // MARK: - Functions
+    func updateTableViewHeight() {
+        let newHeight = CGFloat(cities.count * 54)
+        heightConstraint.constant = newHeight
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
     }
     
     func checkEnteredCity(for cityName: String) {
