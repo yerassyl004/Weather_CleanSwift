@@ -121,6 +121,7 @@ final class MainViewController: UIViewController {
         }
     }
     
+    // MARK: - Setup Navigation
     func setupNavigation() {
         let leftButton = UIBarButtonItem(image: UIImage(systemName: "list.dash"),
                                          style: .done,
@@ -129,7 +130,7 @@ final class MainViewController: UIViewController {
         navigationItem.leftBarButtonItem = leftButton
     }
     
-    // MARK: - SetupViews
+    // MARK: - Setup Views
     private func setupViews() {
         MainConfigurator.shared.configure(viewController: self)
         view.backgroundColor = .systemBackground
@@ -142,6 +143,7 @@ final class MainViewController: UIViewController {
         view.addSubview(scrollView)
     }
     
+    // MARK: - Setup Constraints
     func setupConstraints() {
         scrollView.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview()
