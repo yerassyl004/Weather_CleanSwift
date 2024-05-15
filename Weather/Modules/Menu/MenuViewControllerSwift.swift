@@ -21,10 +21,12 @@ final class MenuViewController: UIViewController{
     // MARK: - Deps
     private var defaults = UserDefaultsManager.shared
     private var heightConstraint: NSLayoutConstraint!
-    let menuWidth = UIScreen.main.bounds.width - 100
+    let menuWidth = UIScreen.main.bounds.width - 80
     let manageVC = ManageViewController()
     var houryForecast: [DatumHourly] = []
     private var cities = [CityData]()
+    private var currentSelected: IndexPath?
+    private var previousSelected: IndexPath?
     
     weak var menuDelegate: MenuDelegate?
     weak var delegate: ManageDelegate?
@@ -145,8 +147,6 @@ final class MenuViewController: UIViewController{
     
     @objc func manageButtonTapped() {
         delegate?.didTapped()
-//        manageVC.modalPresentationStyle = .fullScreen
-//        present(manageVC, animated: true)
     }
     
     func checkEnteredCity(for cityName: String) {
@@ -183,10 +183,13 @@ extension MenuViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let vc = MainViewController()
-        let city = cities[indexPath.row].name
+        let selectedCity = cities[indexPath.row]
+        cities.remove(at: indexPath.row)
+        cities.insert(selectedCity, at: 0)
+        let city = selectedCity.name
         menuDelegate?.didSelectMenuItem(city: city)
         defaults.saveCurrentCity(cityName: city)
+        tableView.reloadData()
     }
 }
 

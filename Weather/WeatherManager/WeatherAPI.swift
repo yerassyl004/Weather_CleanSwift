@@ -32,7 +32,7 @@ extension WeatherAPI: TargetType {
     }
     
     var sampleData: Data {
-        return Data() // You can provide sample data for testing if needed
+        return Data()
     }
     
     var task: Task {
