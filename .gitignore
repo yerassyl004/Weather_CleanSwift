@@ -1,9 +1,26 @@
-Build/
-WeatherTests
-xcuserdata/
-
-*.xcscmblueprint
-*.xccheckout
-
+# Xcode
+#
+# Build generated
 build/
 DerivedData/
+
+# Various settings
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+
+# Other
+*.moved-aside
+*.xcuserstate
+
+# Swift Package Manager
+#
+# User-specific
+.swiftpm/xcode/package.pins
+# Xcode automatically generates this directory, ignore it.
+.build/
+# If you're using SwiftPM with a package, you should probably ignore these files too.
+Package.resolved
