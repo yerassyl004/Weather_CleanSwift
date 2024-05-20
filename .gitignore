@@ -1,2 +1,9 @@
 Build/
 WeatherTests
+xcuserdata/
+
+*.xcscmblueprint
+*.xccheckout
+
+build/
+DerivedData/
