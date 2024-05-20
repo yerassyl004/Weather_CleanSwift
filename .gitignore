@@ -1,0 +1,48 @@
+# Xcode
+#
+# Xcode project files
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserstate
+xcuserdata/
+
+# Build products
+build/
+DerivedData/
+
+# Xcode specific
+*.xcworkspace
+!default.xcworkspace
+
+# Swift Package Manager
+#
+.build/
+.swiftpm/
+Package.resolved
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+Carthage/Checkouts/
+
+# fastlane
+fastlane/report.xml
+fastlane/screenshots
+fastlane/test_output
+.fastlane/
+
+# IDEs and editors
+.idea/
+.vscode/
+
+# macOS
+.DS_Store
+
+# Others
+*.moved-aside
+*.swp
+*.lock
