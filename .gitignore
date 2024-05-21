@@ -90,10 +90,11 @@ fastlane/test_output
 # After new code Injection tools there's a generated folder /iOSInjectionProject
 # https://github.com/johnno1962/injectionforxcode
 
+Weather.xcodeproj/project.xcworkspace
 iOSInjectionProject/
 
 Weather.xcworkspace/xcuserdata
-Weather/Weather.xcodeproj/project.xcworkspace
+Weather.xcodeproj/project.xcworkspace
 
 .DS_Store
 optima-business/.DS_Store
