@@ -101,6 +101,7 @@ final class MainViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.currentCityName = defaults.getCurrentCity()
         if let currentCityName {
             let qu = DispatchQueue.global()
             qu.async {

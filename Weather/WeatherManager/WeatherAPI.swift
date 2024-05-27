@@ -38,7 +38,7 @@ extension WeatherAPI: TargetType {
     var task: Task {
         switch self {
         case .fetchHourlyForecast(let cityName), .fetchWeeklyForecast(let cityName):
-            return .requestParameters(parameters: ["city": cityName, "key": "ff7d9445d443415f8ee31181df1ee3ff"], encoding: URLEncoding.default)
+            return .requestParameters(parameters: ["city": cityName, "key": "139a0617bd294ab09ec25f1099d1812f"], encoding: URLEncoding.default)
         }
     }
     

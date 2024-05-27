@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0E04565E2BD77EAA00B62824 /* WeatherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E04565D2BD77EAA00B62824 /* WeatherTests.swift */; };
-		0E0A8E462C00A82D002E3ACA /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 0E0A8E452C00A82D002E3ACA /* Alamofire */; };
-		0E0A8E492C00A83A002E3ACA /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0E0A8E482C00A83A002E3ACA /* SnapKit */; };
+		0E0A8E402C00A5C1002E3ACA /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0E0A8E3F2C00A5C1002E3ACA /* SnapKit */; };
+		0E0A8E432C00A5E5002E3ACA /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 0E0A8E422C00A5E5002E3ACA /* Alamofire */; };
 		0E0C56052B4BF6BD008DCFD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0C56042B4BF6BD008DCFD6 /* AppDelegate.swift */; };
 		0E0C56072B4BF6BD008DCFD6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0C56062B4BF6BD008DCFD6 /* SceneDelegate.swift */; };
 		0E0C56092B4BF6BD008DCFD6 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0C56082B4BF6BD008DCFD6 /* MainViewController.swift */; };
@@ -159,10 +159,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0E0A8E462C00A82D002E3ACA /* Alamofire in Frameworks */,
 				0E7108BE2BF3B6EF0045C64E /* ReactiveMoya in Frameworks */,
+				0E0A8E402C00A5C1002E3ACA /* SnapKit in Frameworks */,
 				0E7108BC2BF3B6EF0045C64E /* Moya in Frameworks */,
-				0E0A8E492C00A83A002E3ACA /* SnapKit in Frameworks */,
+				0E0A8E432C00A5E5002E3ACA /* Alamofire in Frameworks */,
 				0E7108BA2BF3B6EF0045C64E /* CombineMoya in Frameworks */,
 				0E7108C02BF3B6EF0045C64E /* RxMoya in Frameworks */,
 			);
@@ -464,8 +464,8 @@
 				0E7108BB2BF3B6EF0045C64E /* Moya */,
 				0E7108BD2BF3B6EF0045C64E /* ReactiveMoya */,
 				0E7108BF2BF3B6EF0045C64E /* RxMoya */,
-				0E0A8E452C00A82D002E3ACA /* Alamofire */,
-				0E0A8E482C00A83A002E3ACA /* SnapKit */,
+				0E0A8E3F2C00A5C1002E3ACA /* SnapKit */,
+				0E0A8E422C00A5E5002E3ACA /* Alamofire */,
 			);
 			productName = Weather;
 			productReference = 0E0C56012B4BF6BD008DCFD6 /* Weather.app */;
@@ -521,8 +521,8 @@
 			mainGroup = 0E0C55F82B4BF6BD008DCFD6;
 			packageReferences = (
 				0E7108B62BF3B5D00045C64E /* XCRemoteSwiftPackageReference "Moya" */,
-				0E0A8E442C00A82D002E3ACA /* XCRemoteSwiftPackageReference "Alamofire" */,
-				0E0A8E472C00A83A002E3ACA /* XCRemoteSwiftPackageReference "SnapKit" */,
+				0E0A8E3E2C00A5C1002E3ACA /* XCRemoteSwiftPackageReference "SnapKit" */,
+				0E0A8E412C00A5E5002E3ACA /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			productRefGroup = 0E0C56022B4BF6BD008DCFD6 /* Products */;
 			projectDirPath = "";
@@ -961,20 +961,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		0E0A8E442C00A82D002E3ACA /* XCRemoteSwiftPackageReference "Alamofire" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.9.1;
-			};
-		};
-		0E0A8E472C00A83A002E3ACA /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+		0E0A8E3E2C00A5C1002E3ACA /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Snapkit/SnapKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.7.1;
+			};
+		};
+		0E0A8E412C00A5E5002E3ACA /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.9.1;
 			};
 		};
 		0E7108B62BF3B5D00045C64E /* XCRemoteSwiftPackageReference "Moya" */ = {
@@ -988,15 +988,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		0E0A8E452C00A82D002E3ACA /* Alamofire */ = {
+		0E0A8E3F2C00A5C1002E3ACA /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0E0A8E442C00A82D002E3ACA /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = Alamofire;
-		};
-		0E0A8E482C00A83A002E3ACA /* SnapKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0E0A8E472C00A83A002E3ACA /* XCRemoteSwiftPackageReference "SnapKit" */;
+			package = 0E0A8E3E2C00A5C1002E3ACA /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		0E0A8E422C00A5E5002E3ACA /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0E0A8E412C00A5E5002E3ACA /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 		0E7108B92BF3B6EF0045C64E /* CombineMoya */ = {
 			isa = XCSwiftPackageProductDependency;
