@@ -95,5 +95,10 @@ iOSInjectionProject/
 Weather.xcworkspace/xcuserdata
 Weather.xcodeproj/project.xcworkspace
 
+WeatherTests
+WeatherWidget
+
 .DS_Store
 Weather/.DS_Store
+
+
