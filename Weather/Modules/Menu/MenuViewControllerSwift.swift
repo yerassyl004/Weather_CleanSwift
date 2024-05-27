@@ -178,8 +178,8 @@ extension MenuViewController: UITableViewDelegate, UITableViewDataSource {
         cities.remove(at: indexPath.row)
         cities.insert(selectedCity, at: 0)
         let city = selectedCity.name
-        menuDelegate?.didSelectMenuItem(city: city)
         defaults.saveCurrentCity(cityName: city)
+        menuDelegate?.didSelectMenuItem(city: city)
         tableView.reloadData()
     }
 }
