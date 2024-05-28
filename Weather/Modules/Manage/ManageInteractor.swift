@@ -34,6 +34,13 @@ extension ManageInteractor: ManageBusinessLogic {
         if let cities {
             cityData.append(contentsOf: cities)
         }
+        
+        if cityData.contains(where: { $0.name.lowercased() == cityName.lowercased() }) {
+            print("City \(cityName) is already in the list.")
+            presenter?.showAlert(message: "City \(cityName) is already in the list.")
+            return
+        }
+        
         ApiManager.shared.fetchHourlyForecast(cityName: cityName) { result in
             switch result {
             case .success(let hourlyForecast):

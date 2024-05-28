@@ -14,6 +14,7 @@ protocol ManageViewControllerDelegate: AnyObject {
 
 protocol ManageDisplayLogic: AnyObject {
     func displayCityData(data: [CityData])
+    func displayAlert(message: String)
 }
 
 final class ManageViewController: UIViewController {
@@ -160,25 +161,15 @@ final class ManageViewController: UIViewController {
         tableView.isEditing.toggle()
     }
     
-    func showErrorLabel(in alert: UIAlertController) {
-        let errorLabel = UILabel()
-        errorLabel.text = "Please enter a non-empty text"
-        errorLabel.textColor = .red
-
-        alert.view.addSubview(errorLabel)
-
-        let height: CGFloat = 30
-        let padding: CGFloat = 8
-
-        NSLayoutConstraint.activate([
-            errorLabel.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: padding),
-            errorLabel.leadingAnchor.constraint(equalTo: alert.view.leadingAnchor, constant: padding),
-            errorLabel.trailingAnchor.constraint(equalTo: alert.view.trailingAnchor, constant: -padding),
-            errorLabel.heightAnchor.constraint(equalToConstant: height)
-        ])
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            alert.dismiss(animated: true, completion: nil)
-        }
+    func showErrorAlert(message: String) {
+        let alert = UIAlertController(title: "Error",
+                                      message: message,
+                                      preferredStyle: .alert)
+        let cancel = UIAlertAction(title: "Ok",
+                                   style: .cancel,
+                                   handler: nil)
+        alert.addAction(cancel)
+        present(alert, animated: true)
     }
 }
 
@@ -211,6 +202,10 @@ extension ManageViewController: UITableViewDelegate, UITableViewDataSource {
 }
 
 extension ManageViewController: ManageDisplayLogic {
+    func displayAlert(message: String) {
+        showErrorAlert(message: message)
+    }
+    
     func displayCityData(data: [CityData]) {
         cities = data
         print(cities)

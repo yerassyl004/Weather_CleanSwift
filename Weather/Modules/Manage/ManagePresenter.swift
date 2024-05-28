@@ -14,6 +14,7 @@ import UIKit
 
 protocol ManagePresentationLogic {
     func presentCityData(data: [CityData])
+    func showAlert(message: String)
 }
 
 final class ManagePresenter: ManagePresentationLogic {
@@ -21,5 +22,9 @@ final class ManagePresenter: ManagePresentationLogic {
     
     func presentCityData(data: [CityData]) {
         viewController?.displayCityData(data: data)
+    }
+    
+    func showAlert(message: String) {
+        viewController?.displayAlert(message: message)
     }
 }

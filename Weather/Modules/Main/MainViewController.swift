@@ -97,6 +97,7 @@ final class MainViewController: UIViewController {
         setupNavigation()
         setupViews()
         setupConstraints()
+        displayUI(isHidden: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -190,6 +191,12 @@ final class MainViewController: UIViewController {
         }
     }
     
+    private func displayUI(isHidden: Bool) {
+        [cityNameLabel, cityTemperatureLabel, currentWeatherLabel, hightLowLabel, cityFeelsLikeTemperatureLabel, hourlyView, weeklyView].forEach { items in
+            items.isHidden = isHidden
+        }
+    }
+    
     // MARK: - Actions
     @objc func didTapMenuButton() {
         delegate?.menuButtonDidTapped()
@@ -200,6 +207,7 @@ final class MainViewController: UIViewController {
 extension MainViewController: MainDisplayLogic {
     func displayWeeklyData(data: [MainModel.DaylyModel]) {
         self.cellModel = data
+        displayUI(isHidden: false)
         weeklyView.setData(forecast: data)
         
         if let data = data.first {
