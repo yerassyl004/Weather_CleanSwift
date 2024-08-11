@@ -4,7 +4,8 @@ import Foundation
 struct WelcomeHourly: Codable {
     let cityName, countryCode: String
     let data: [DatumHourly]
-    let lat, lon, stateCode, timezone: String
+    let stateCode, timezone: String
+    let lat, lon: Double
 
     enum CodingKeys: String, CodingKey {
         case cityName = "city_name"

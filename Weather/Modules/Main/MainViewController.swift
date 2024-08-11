@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import CoreLocation
 
 protocol HomeViewControllerDelegate: AnyObject {
     func menuButtonDidTapped()
@@ -102,6 +103,7 @@ final class MainViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        let locationManager = CurrentLocation()
         self.currentCityName = defaults.getCurrentCity()
         if let currentCityName {
             let qu = DispatchQueue.global()
@@ -111,6 +113,8 @@ final class MainViewController: UIViewController {
             qu.async {
                 self.interactor?.fetchDataForCity(for: currentCityName)
             }
+        } else {
+            self.interactor?.fetchDataWithCordinate()
         }
     }
     
