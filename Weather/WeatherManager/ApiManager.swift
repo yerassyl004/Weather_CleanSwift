@@ -15,7 +15,8 @@ final class ApiManager {
     
     private init() {}
     
-    func fetchHourlyForecast(cityName: String, completion: @escaping (Result<WelcomeHourly, Error>) -> Void) {
+    func fetchHourlyForecast(cityName: String, 
+                             completion: @escaping (Result<WelcomeHourly, Error>) -> Void) {
         provider.request(.fetchHourlyForecast(cityName: cityName)) { result in
             switch result {
             case .success(let response):

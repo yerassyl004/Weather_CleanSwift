@@ -74,11 +74,9 @@ final class MenuViewController: UIViewController{
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if let cityData = defaults.getCityData() {
-            cities = cityData
-            updateTableViewHeight()
-            tableView.reloadData()
-        }
+        cities = ListCities.shared.getListCities()
+        updateTableViewHeight()
+        tableView.reloadData()
     }
     
     override func viewDidLayoutSubviews() {
