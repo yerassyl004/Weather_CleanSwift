@@ -11,6 +11,8 @@ import Foundation
 enum WeatherAPI {
     case fetchHourlyForecast(cityName: String)
     case fetchWeeklyForecast(cityName: String)
+    case fetchHourlyForecastCordinate(lat: String, long: String)
+    case fetchWeeklyForecastCordinate(lat: String, long: String)
 }
 
 extension WeatherAPI: TargetType {
@@ -23,6 +25,10 @@ extension WeatherAPI: TargetType {
         case .fetchHourlyForecast:
             return "/forecast/hourly"
         case .fetchWeeklyForecast:
+            return "/forecast/daily"
+        case .fetchHourlyForecastCordinate:
+            return "/forecast/hourly"
+        case .fetchWeeklyForecastCordinate:
             return "/forecast/daily"
         }
     }
@@ -42,6 +48,11 @@ extension WeatherAPI: TargetType {
                                         ["city": cityName,
                                          "key": "82eec0985e9b44bf8f5856b61874c70d"],
                                       encoding: URLEncoding.default)
+        case .fetchHourlyForecastCordinate(let lat, let long),
+                .fetchWeeklyForecastCordinate(let lat, let long):
+            return .requestParameters(parameters: ["lat": lat,
+                                                   "lon": long,
+                                                   "key": "82eec0985e9b44bf8f5856b61874c70d"], encoding: URLEncoding.default)
         }
     }
     

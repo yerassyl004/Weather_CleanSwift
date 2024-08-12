@@ -58,6 +58,7 @@
 		0EF73A772B4D771000378791 /* ContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EF73A762B4D771000378791 /* ContainerViewController.swift */; };
 		0EF73A792B4D794900378791 /* MenuViewControllerSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EF73A782B4D794900378791 /* MenuViewControllerSwift.swift */; };
 		C48DFC392C68694400F33F89 /* ListCities.swift in Sources */ = {isa = PBXBuildFile; fileRef = C48DFC382C68694400F33F89 /* ListCities.swift */; };
+		C48DFC3B2C686B0A00F33F89 /* CurrentLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C48DFC3A2C686B0A00F33F89 /* CurrentLocation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -125,6 +126,7 @@
 		0EF73A762B4D771000378791 /* ContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerViewController.swift; sourceTree = "<group>"; };
 		0EF73A782B4D794900378791 /* MenuViewControllerSwift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewControllerSwift.swift; sourceTree = "<group>"; };
 		C48DFC382C68694400F33F89 /* ListCities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCities.swift; sourceTree = "<group>"; };
+		C48DFC3A2C686B0A00F33F89 /* CurrentLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentLocation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -408,6 +410,7 @@
 			isa = PBXGroup;
 			children = (
 				C48DFC382C68694400F33F89 /* ListCities.swift */,
+				C48DFC3A2C686B0A00F33F89 /* CurrentLocation.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -574,6 +577,7 @@
 				0E44A7ED2BF46CF300815DA0 /* AppKeys.swift in Sources */,
 				0EA04A642BF4CC4800C8AED5 /* ManagePresenter.swift in Sources */,
 				0EA04A652BF4CC4800C8AED5 /* ManageWorker.swift in Sources */,
+				C48DFC3B2C686B0A00F33F89 /* CurrentLocation.swift in Sources */,
 				0EA04A662BF4CC4800C8AED5 /* ManageRouter.swift in Sources */,
 				0EA04A672BF4CC4800C8AED5 /* ManageModels.swift in Sources */,
 				0EA04A682BF4CC4800C8AED5 /* ManageInteractor.swift in Sources */,

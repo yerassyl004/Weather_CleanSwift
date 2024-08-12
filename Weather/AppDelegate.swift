@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,6 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let navigationController = UINavigationController(rootViewController: MenuViewController())
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
+
         return true
     }
 
