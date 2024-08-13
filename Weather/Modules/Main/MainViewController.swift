@@ -125,6 +125,7 @@ final class MainViewController: UIViewController {
                                          target: self,
                                          action: #selector(didTapMenuButton))
         navigationItem.leftBarButtonItem = leftButton
+        navigationItem.leftBarButtonItem?.tintColor = .white
     }
     
     // MARK: - Setup Views
