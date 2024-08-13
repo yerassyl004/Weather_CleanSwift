@@ -49,6 +49,12 @@ class MainInteractor: MainDataStore, MainBusinessLogic {
     
     func fetchDataWithCordinate() {
         locationManager = CurrentLocation()
+        let defaults = UserDefaultsManager.shared
+        var cities = defaults.getCityData()
+        var cityData = [CityData]()
+        if let cities {
+            cityData.append(contentsOf: cities)
+        }
         
         print("fetchDataWithCordinate called")
         
@@ -66,7 +72,17 @@ class MainInteractor: MainDataStore, MainBusinessLogic {
                     long: coordinate.longitude) { result in
                         switch result {
                         case .success(let hourlyForecast):
+                            if let data = hourlyForecast.data.first {
+                                if cityData.contains(where: { $0.name.lowercased() == hourlyForecast.cityName.lowercased() }) {
+                                    print("City \(hourlyForecast.cityName) is already in the list.")
+                                    return
+                                } else {
+                                    cityData.append(CityData(name: hourlyForecast.cityName, temperature: Int(round(data.temp)), icon: data.weather.icon, currentCity: true))
+                                    defaults.saveCityData(data: cityData)
+                                }
+                            }
                             self.presenter?.presentHourly(forecast: hourlyForecast)
+                            
                         case .failure(let error):
                             print("Error fetching hourly forecast: \(error)")
                         }
